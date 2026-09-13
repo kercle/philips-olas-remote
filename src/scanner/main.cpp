@@ -10,12 +10,16 @@
 #define CC1101_REG_PKTCTRL0 0x08
 
 #define BUFFER_CAPACITY 2000
-#define MAX_EDGE_COUNT_PER_ROW 20
+#define MAX_EDGE_COUNT_PER_ROW 10
 
 volatile uint64_t edge_times[BUFFER_CAPACITY];
 volatile bool edge_levels[BUFFER_CAPACITY];
 volatile uint32_t edge_count = 0;
 volatile uint64_t last_edge_time = 0;
+
+// For moving edges and durations out of volatile states
+uint64_t current_edge_times[BUFFER_CAPACITY];
+bool current_edge_levels[BUFFER_CAPACITY];
 
 uint16_t edges_in_row = 0;
 
@@ -44,8 +48,7 @@ void IRAM_ATTR on_edge()
 
 void setup()
 {
-    Serial.setDebugOutput(false);
-    Serial.begin(115200);
+    Serial.begin(74880);
     delay(1000);
 
     WiFi.mode(WIFI_OFF);
@@ -81,10 +84,8 @@ void loop()
 
     noInterrupts();
     uint32_t current_edge_count = edge_count;
-    uint64_t current_edge_times[BUFFER_CAPACITY];
-    bool current_edge_levels[BUFFER_CAPACITY];
 
-    for (uint32_t i; i < current_edge_count; ++i) {
+    for (uint32_t i = 0; i < current_edge_count; ++i) {
         current_edge_times[i] = edge_times[i];
         current_edge_levels[i] = edge_levels[i];
     }
@@ -100,7 +101,7 @@ void loop()
 
         Serial.print(current_edge_levels[i] ? "H[" : "L[");
         Serial.print(current_edge_times[i]);
-        Serial.print("]");
+        Serial.print("] ");
 
         ++edges_in_row;
     }
