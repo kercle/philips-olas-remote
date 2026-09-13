@@ -29,8 +29,8 @@ The protocol was recorded using the firmware compiled from the `scanner` build-t
 
 | Field      | RF State     | Duration   |
 | :--------- | :----------- | :--------- |
-| Sync ON    | Carrier ON   | ~7 400 µs  |
-| Sync OFF   | Carrier OFF  | ~1 090 µs  |
+| Sync ON    | Carrier ON   | ~7400 µs  |
+| Sync OFF   | Carrier OFF  | ~1090 µs  |
 
 #### Data bits
 
@@ -99,3 +99,16 @@ All function codes below are the base value with sequence bits zeroed
 | Day White            | `0x84`        | `0xDF`          |
 | Light On             | `0x7C`        | `0x27`          |
 | Light Off            | `0xBC`        | `0xE7`          |
+
+## Implementation details
+
+In order to be able to send precise signals while not being disturbed by WiFi interrupts, we send frames via the CC1101's internal FIFO queue. From the experiments, we have seen that e.g. a zero is encoded as `~340 µs` high and `~730 µs` low. If we set the CC1101 transmission rate to `9323 bits/s`, which every `107.262 µs` one bit is transferred from the FIFO queue. This allows us to control the timings of the signals we want to send:
+
+| Level duration | Number of bit repetitions |
+|:--------|:- |
+| 321.786 µs (Approximately 340 µs)  | 3 |
+| 750.834 µs (Approximately 730 µs) | 7 |
+| 7401.078 µs (Approximately 7400 µs) | 69 |
+| 1072.62 µs (Approximately 1090 µs) | 10 |
+
+These timings are close enough for the fan to register them. Since one frame contains 41 bits and each bit is encoded by 10 bits in the FIFO queue (*3 (short) + 7 (long)*) we need 69+10+41·10=489 bits corresponding to 62 bytes in the FIFO queue. This means that we can send exactly one command to the fan via the FIFO queue without manual timing efforts.
