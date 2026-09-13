@@ -8,7 +8,7 @@ project_dir = Path(
 )
 
 assets_dir = project_dir / "web"
-assets_target_dir = project_dir / "include" / "web" / "assets"
+assets_target_dir = project_dir / "include" / "web_remote" / "assets"
 assets_target_dir.mkdir(parents=True, exist_ok=True)
 
 for path in assets_dir.rglob("*"):
