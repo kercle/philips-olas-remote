@@ -1,6 +1,8 @@
 # PHILIPS Olas ceiling fan
 
-This little project aims at implementing the protocol of the PHILIPS Olas ceiling fan for the purpose of home automation. The software was implemented for an ESP8266 micro-controller (NodeMCU) connected to a CC1101 module, but it can easily be adopted to other platforms.
+![Philips Olas ceiling fan](./assets/philips-olas-fan.png)
+
+This little project aims at implementing the protocol of the [PHILIPS Olas ceiling fan](https://www.lighting.philips.at/consumer/p/deckenventilator-mit-beleuchtung-olas-deckenventilatorleuchte-32-w-ventilator-24-w-leuchte/8720169369993) for the purpose of home automation. The software was implemented for an ESP8266 micro-controller (NodeMCU) connected to a CC1101 module, but it can easily be adopted to other platforms.
 
 ## Hardware
 
