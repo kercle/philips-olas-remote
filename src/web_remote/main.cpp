@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <RadioLib.h>
 
 #include <config.h>
@@ -16,6 +17,7 @@ void setup_wifi()
     WiFi.mode(WIFI_STA);
     WiFi.hostname("philips-olas-remote");
     WiFi.begin(WIFI_SSID, WIFI_PASS);
+    MDNS.begin("philips-olas-remote");
 
     Serial.print(F("Connecting to Wi-Fi"));
     while (WiFi.status() != WL_CONNECTED) {
@@ -65,7 +67,6 @@ void loop()
     }
 
     web_server.handle_client();
+    MDNS.update();
     yield();
-
-    delay(10);
 }
