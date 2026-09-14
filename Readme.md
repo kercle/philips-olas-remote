@@ -12,7 +12,7 @@ The remote can be prototyped on a simple breadboard. The circuit diagram using a
 
 ## Protocol
 
-The protocol was recorded using the firmware compiled from the `scanner` build-target. The firmware records permanently records high/low edges together with the time passed since the last detected edge. The protocol extraction was partly supported by Claude.
+The protocol was recorded using the firmware compiled from the `scanner` build-target. The firmware records permanently records high/low edges together with the time passed since the last detected edge. The protocol extraction was partly assisted by Claude.
 
 ### Physical layer
 
@@ -34,12 +34,12 @@ The protocol was recorded using the firmware compiled from the `scanner` build-t
 
 #### Data bits
 
-Each logical bit has a total period of ~1 070 µs.
+Each logical bit has a total period of ~1070 µs.
 
 | Bit value | RF sequence              | ON duration | OFF duration |
 | :-------- | :----------------------- | :---------- | :----------- |
 | **0**     | short ON, long OFF       | ~340 µs     | ~730 µs      |
-| **1**     | long ON, short OFF       | ~735 µs     | ~340 µs      |
+| **1**     | long ON, short OFF       | ~730 µs     | ~340 µs      |
 
 ### Frame repetition
 
@@ -102,7 +102,7 @@ All function codes below are the base value with sequence bits zeroed
 
 ## Implementation details
 
-In order to be able to send precise signals while not being disturbed by WiFi interrupts, we send frames via the CC1101's internal FIFO queue. From the experiments, we have seen that e.g. a zero is encoded as `~340 µs` high and `~730 µs` low. If we set the CC1101 transmission rate to `9323 bits/s`, which every `107.262 µs` one bit is transferred from the FIFO queue. This allows us to control the timings of the signals we want to send:
+In order to be able to send precise signals while not being disturbed by WiFi interrupts, we send frames via the CC1101's internal FIFO queue. From the experiments, we have seen that e.g. a zero is encoded as `~340 µs` high and `~730 µs` low. If we set the CC1101 transmission rate to `9323 bits/s` we note that every `107.262 µs` one bit is transferred from the FIFO queue. This allows us to control the timings of the signals we want to send:
 
 | Level duration | Number of bit repetitions |
 |:--------|:- |
@@ -111,4 +111,6 @@ In order to be able to send precise signals while not being disturbed by WiFi in
 | 7401.078 µs (Approximately 7400 µs) | 69 |
 | 1072.62 µs (Approximately 1090 µs) | 10 |
 
-These timings are close enough for the fan to register them. Since one frame contains 41 bits and each bit is encoded by 10 bits in the FIFO queue (*3 (short) + 7 (long)*) we need 69+10+41·10=489 bits corresponding to 62 bytes in the FIFO queue. This means that we can send exactly one command to the fan via the FIFO queue without manual timing efforts.
+These timings are close enough for the fan to register them. Since one frame contains 41 bits and each bit is encoded by 10 bits in the FIFO queue (`3 (short) + 7 (long)`) we need `69 (sync on) + 10 (sync off) + 41 (bits per frame) × 10 = 489` bits corresponding to 62 bytes in the FIFO queue. This means that we can send exactly one command to the fan via the FIFO queue without manual timing efforts.
+
+This massively simplifies the communication, since now we don't have to worry about timing anymore.
