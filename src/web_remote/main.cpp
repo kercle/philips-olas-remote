@@ -34,8 +34,9 @@ void setup_webserver()
 
     Serial.print(F("Web server ready.\nGo to http://"));
     Serial.print(WiFi.localIP());
-    Serial.print('/');
-    Serial.println(" to access the dashboard.");
+    Serial.print(F("/ or http://"));
+    Serial.print(config::hostname);
+    Serial.println(".local/ to access the dashboard.");
 }
 
 void setup()
