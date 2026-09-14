@@ -4,7 +4,7 @@
 
 namespace olas {
 
-enum Command {
+enum Command : uint8_t {
     FanOff = 0x10,
     FanSpeed1 = 0x40,
     FanSpeed2 = 0xAC,
