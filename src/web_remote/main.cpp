@@ -5,15 +5,13 @@
 #include <config.h>
 #include <secrets.h>
 
-#include <olas/protocol.h>
-#include <olas/radio.h>
+#include <olas/controller.h>
 
 #include <web_remote/assets/index.html.h>
 
 ESP8266WebServer server(80);
 
-olas::FrameBuilder frame_builder(FAN_ID, 0);
-olas::RadioTransmitter transmitter(frame_builder);
+olas::Controller controller(FAN_ID);
 
 void setup_wifi()
 {
@@ -58,7 +56,7 @@ void setup()
     setup_wifi();
     setup_webserver();
 
-    auto res = transmitter.initialize();
+    auto res = controller.initialize();
     if (res.is_err()) {
         Serial.print(F("Radio transmitter initialization failed: "));
         Serial.println(res.code());
