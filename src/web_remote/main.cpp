@@ -1,7 +1,3 @@
-#include <functional>
-#include <optional>
-
-#include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <RadioLib.h>
 
@@ -11,11 +7,9 @@
 #include <olas/controller.h>
 
 #include <web_remote/assets/index.html.h>
+#include <web_remote/web_server.h>
 
-ESP8266WebServer server(80);
 olas::Controller controller(FAN_ID);
-
-std::optional<std::function<void()>> task = std::nullopt;
 
 void setup_wifi()
 {
@@ -34,15 +28,7 @@ void setup_wifi()
 
 void setup_webserver()
 {
-    server.on("/", HTTP_GET, []() {
-        server.send_P(200, "text/html", assets::INDEX_HTML);
-    });
-
-    server.onNotFound([]() {
-        server.send(404, "text/plain", "Not found.");
-    });
-
-    server.begin();
+    FanControllerWebServer::get_instance().initialize();
 
     Serial.print(F("Web server ready.\nGo to http://"));
     Serial.print(WiFi.localIP());
@@ -71,11 +57,13 @@ void setup()
 
 void loop()
 {
+    FanControllerWebServer& web_server = FanControllerWebServer::get_instance();
+
+    auto task = web_server.take_task();
     if (task.has_value()) {
-        (*task)();
-        task = std::nullopt;
+        (*task)(controller);
     }
 
-    server.handleClient();
+    web_server.handle_client();
     yield();
 }
