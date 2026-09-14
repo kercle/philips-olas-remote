@@ -21,7 +21,7 @@ FrameBuilder::FrameBuilder(uint32_t fan_id, uint8_t init_frame_counter)
 {
 }
 
-Frame FrameBuilder::build(Command cmd)
+Frame FrameBuilder::build(Command cmd) const
 {
     uint8_t cmd_byte = (cmd & 0xFC) | (frame_counter & 0x3);
     uint8_t chk_byte = cmd_byte ^ 0x5B;
@@ -30,8 +30,13 @@ Frame FrameBuilder::build(Command cmd)
         | ((uint64_t)cmd_byte << 9)
         | ((uint64_t)chk_byte << 1);
 
-    frame_counter++;
     return Frame(frame);
+}
+
+void FrameBuilder::advance_frame_counter()
+{
+    // decrement unsigned frame counter
+    frame_counter = (frame_counter + 3) & 0x03;
 }
 
 }

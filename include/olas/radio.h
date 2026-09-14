@@ -19,11 +19,11 @@ public:
         memset(data, 0, N_BYTES);
     }
 
-    void push(bool bit)
+    bool push(bool bit)
     {
         if (bit_idx >= N_BYTES * 8) {
             // no space left
-            return;
+            return false;
         }
 
         unsigned byte_idx = bit_idx >> 3;
@@ -34,23 +34,46 @@ public:
         }
 
         ++bit_idx;
+
+        return true;
     }
 
     void push_repeated(bool bit, unsigned count)
     {
         for (unsigned i = 0; i < count; ++i) {
-            push(bit);
+            if (!push(bit)) {
+                return false;
+            }
         }
     }
 
-    const uint8_t* get_raw() const {
+    const uint8_t* get_raw() const
+    {
         return data;
     }
 };
 
+class RadioTransmitterInitResult {
+    bool _ok;
+    int16_t _code;
+
+    RadioTransmitterInitResult(bool _ok, int16_t _code);
+
+public:
+    static RadioTransmitterInitResult ok();
+    static RadioTransmitterInitResult err(int16_t code);
+
+    bool is_err() const;
+    int16_t code() const;
+};
+
 class RadioTransmitter {
     FrameBuilder& frame_builder;
+
+    Module radio_module;
     CC1101 radio;
+
+    bool initialized;
 
     void encode_bit(BitSequence<WAVEFORM_BYTES>& waveform, bool bit);
     void encode_sync_signal(BitSequence<WAVEFORM_BYTES>& waveform);
@@ -59,7 +82,8 @@ class RadioTransmitter {
     bool transmit_waveform(BitSequence<WAVEFORM_BYTES>& waveform);
 
 public:
-    RadioTransmitter(FrameBuilder& frame_builder, CC1101 radio);
+    RadioTransmitter(FrameBuilder& frame_builder);
+    RadioTransmitterInitResult initialize();
 
     bool transmit(Command cmd);
     bool transmit_bursts(Command cmd, uint8_t repeats);

@@ -48,7 +48,8 @@ class FrameBuilder {
 public:
     FrameBuilder(uint32_t fan_id, uint8_t init_frame_counter);
 
-    Frame build(Command cmd);
+    Frame build(Command cmd) const;
+    void advance_frame_counter();
 };
 
 }
