@@ -60,12 +60,16 @@ void Controller::fan_off()
 
 void Controller::increase_brightness(uint8_t steps)
 {
-    transmitter.transmit_bursts(Command::LightBrightnessUp, bursts);
+    for (uint8_t i = 0; i < steps; ++i) {
+        transmitter.transmit_bursts(Command::LightBrightnessUp, bursts);
+    }
 }
 
 void Controller::decrease_brightness(uint8_t steps)
 {
-    transmitter.transmit_bursts(Command::LightBrightnessDown, bursts);
+    for (uint8_t i = 0; i < steps; ++i) {
+        transmitter.transmit_bursts(Command::LightBrightnessDown, bursts);
+    }
 }
 
 void Controller::sleep_wind()
