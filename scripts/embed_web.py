@@ -1,7 +1,7 @@
 import io
 from pathlib import Path
 
-CHUNK_SIZE = 30
+CHUNK_SIZE = 15
 
 # Import and env is provided by platformio
 Import("env")  # pyright: ignore[reportUndefinedVariable]
@@ -51,19 +51,21 @@ def write_header(file_stream: io.TextIOWrapper, asset_name: str):
         "// To modify this file, edit the respective source file.\n\n"
         "#pragma once\n\n",
         "#include <Arduino.h>\n\n",
-        "namespace assets {\n\n" f'const char {asset_name}[] PROGMEM = R"rawliteral(\n',
+        "namespace assets {\n\n" f'const char {asset_name}[] PROGMEM = ',
     ]
     file_stream.writelines(lines)
 
 
 def write_footer(file_stream: io.TextIOWrapper):
-    file_stream.write('\n)rawliteral";\n\n}\n')
+    file_stream.write(';\n\n}\n')
 
 
 def embed_text_file(source: Path, target: Path, asset_name: str):
     with target.open("w") as f:
         write_header(f, asset_name)
+        f.write('R"rawliteral(\n')
         f.write(source.read_text())
+        f.write('\n)rawliteral"')
         write_footer(f)
 
 
@@ -71,9 +73,12 @@ def embed_binary_file(source: Path, target: Path, asset_name: str):
     with target.open("w") as f_out:
         write_header(f_out, asset_name)
         with source.open("rb") as f_in:
+            end_of_line_char = "{"
             while chunk := f_in.read(CHUNK_SIZE):
-                hex_escaped = "".join(f"\\x{b:02x}" for b in chunk)
-                f_out.write(f'    "{hex_escaped}"\n')
+                hex_escaped = ", ".join(f"0x{b:02x}" for b in chunk)
+                f_out.write(f'{end_of_line_char}\n    {hex_escaped}')
+                end_of_line_char = ","
+        f_out.write("\n}");
         write_footer(f_out)
 
 

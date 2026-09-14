@@ -43,11 +43,15 @@ void FanControllerWebServer::initialize()
     });
 
     server.on("/webfonts/fa-regular-custom.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2);
+        server.send_P(200, "font/woff2",
+            assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2,
+            sizeof(assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2));
     });
 
     server.on("/webfonts/fa-solid-custom.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2);
+        server.send_P(200, "font/woff2",
+            assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2,
+            sizeof(assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2));
     });
 
     // API endpoints
