@@ -10,13 +10,13 @@
 #include <web_remote/assets/index.html.h>
 #include <web_remote/web_server.h>
 
-olas::Controller controller(FAN_ID);
+olas::Controller controller(secrets::fan_id);
 
 void setup_wifi()
 {
     WiFi.mode(WIFI_STA);
     WiFi.hostname(config::hostname);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    WiFi.begin(secrets::wifi_ssid, secrets::wifi_pass);
     MDNS.begin(config::hostname);
 
     Serial.print(F("Connecting to Wi-Fi"));
