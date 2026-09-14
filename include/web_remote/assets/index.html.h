@@ -31,24 +31,59 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
         <h1>Ceiling Fan</h1>
         <div class="light-on-off-panel">
             <button class="off" onclick="sendCommand('/api/light/off')">
-                Light Off
+                <i class="fa-regular button-icon">&#xf185;</i>Light Off
             </button>
             <button class="light-on" onclick="sendCommand('/api/light/on')">
-                <i class="fa-solid fa-sun"></i>Light On
+                <i class="fa-solid button-icon">&#xf185;</i>Light On
             </button>
         </div>
-        <button class="off" onclick="sendCommand('/api/fan/off')">
-            Fan Off
-        </button>
-        <button class="off" onclick="sendCommand('/api/fan/1')">
-            Fan 1
-        </button>
-        <button class="off" onclick="sendCommand('/api/fan/3')">
-            Fan 3
-        </button>
-        <button class="off" onclick="sendCommand('/api/fan/6')">
-            Fan 6
-        </button>
+        <div style="width: 100%;">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 118" width="100%" height="100%">
+                <!-- Center Circle -->
+                <g class="fan-btn" onclick="sendCommand('/api/fan/off')">
+                    <circle class="fan-btn-shape" cx="58.42" cy="58.48" r="26.24" />
+                    <text class="fan-btn-label" x="58.42" y="58.48">
+                        <tspan x="58.42" dy="-0.85em">
+                            <tspan class="fa-icon">&#xf863;</tspan>
+                        </tspan>
+                        <tspan x="58.42" dy="1.7em">Fan off</tspan>
+                    </text>
+                </g>
+
+                <!-- Outer Blades/Segments -->
+                <g class="fan-btn" onclick="sendCommand('/api/fan/5')">
+                    <path class="fan-btn-shape"
+                        d="m 91.93,60.98 21.92,0 c 1.66,0 2.95,1.34 2.8,2.99 -1.59,16.95 -10.48,32.33 -24.36,42.18 -1.35,0.96 -3.16,0.51 -3.99,-0.92 L 77.34,86.25 c -0.83,-1.43 -0.38,-3.35 0.88,-4.42 5.42,-4.59 9.05,-10.88 10.32,-17.87 0.3,-1.63 1.73,-2.97 3.39,-2.97 z" />
+                    <text x="97.56" y="80.10" class="fan-btn-label">5</text>
+                </g>
+                <g class="fan-btn" onclick="sendCommand('/api/fan/6')">
+                    <path class="fan-btn-shape"
+                        d="m 73.01,88.75 10.96,18.98 c 0.83,1.43 0.31,3.23 -1.19,3.92 -15.48,7.09 -33.23,7.08 -48.71,-0.13 -1.5,-0.7 -2.01,-2.5 -1.19,-3.94 L 43.84,88.6 c 0.83,-1.43 2.71,-2.01 4.27,-1.45 6.67,2.39 13.94,2.41 20.61,0.11 1.57,-0.54 3.46,0.05 4.29,1.49 z" />
+                    <text x="58.42" y="102.90" class="fan-btn-label">6</text>
+                </g>
+                <g class="fan-btn" onclick="sendCommand('/api/fan/1')">
+                    <path class="fan-btn-shape"
+                        d="M 39.51,86.25 28.55,105.23 c -0.83,1.43 -2.64,1.88 -3.99,0.93 C 10.67,96.3 1.8,80.93 0.2,63.98 0.05,62.33 1.34,60.99 3,60.99 h 21.92 c 1.66,0 3.1,1.34 3.39,2.97 1.27,6.98 4.9,13.27 10.32,17.86 1.26,1.07 1.71,2.99 0.88,4.42 z" />
+                    <text x="19.28" y="80.10" class="fan-btn-label">1</text>
+                </g>
+                <g class="fan-btn" onclick="sendCommand('/api/fan/2')">
+                    <path class="fan-btn-shape"
+                        d="M 24.92,55.98 H 3 C 1.34,55.98 0.05,54.64 0.2,52.99 1.8,36.04 10.67,20.67 24.56,10.81 c 1.35,-0.96 3.16,-0.51 3.99,0.93 l 10.96,18.98 c 0.83,1.43 0.38,3.35 -0.88,4.42 -5.42,4.59 -9.05,10.88 -10.32,17.86 -0.3,1.63 -1.73,2.98 -3.39,2.98 z" />
+                    <text x="19.28" y="36.86" class="fan-btn-label">2</text>
+                </g>
+                <g class="fan-btn" onclick="sendCommand('/api/fan/3')">
+                    <path class="fan-btn-shape"
+                        d="M 43.84,28.22 32.88,9.24 c -0.83,-1.43 -0.31,-3.23 1.19,-3.92 15.47,-7.09 33.23,-7.09 48.7,0 1.51,0.69 2.02,2.48 1.19,3.92 L 73.01,28.22 c -0.83,1.43 -2.71,2.01 -4.27,1.45 -6.68,-2.4 -13.95,-2.4 -20.63,0 -1.56,0.56 -3.44,-0.01 -4.27,-1.45 z" />
+                    <text x="58.42" y="14.06" class="fan-btn-label">3</text>
+                </g>
+                <g class="fan-btn" onclick="sendCommand('/api/fan/4')">
+                    <path class="fan-btn-shape"
+                        d="M 77.34,30.72 88.3,11.74 c 0.83,-1.43 2.64,-1.88 3.99,-0.92 13.88,9.85 22.75,25.23 24.35,42.17 0.16,1.65 -1.13,2.99 -2.79,2.99 l -21.92,0 c -1.66,0 -3.1,-1.34 -3.39,-2.97 -1.27,-6.98 -4.9,-13.27 -10.32,-17.86 -1.26,-1.07 -1.71,-2.99 -0.88,-4.42 z" />
+                    <text x="97.56" y="36.86" class="fan-btn-label">4</text>
+                </g>
+            </svg>
+
+        </div>
         <div id="status"></div>
     </div>
 </body>

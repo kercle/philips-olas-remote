@@ -15,6 +15,22 @@ body {
     padding: 24px;
 }
 
+.fa-regular {
+    font-family: 'Font Awesome 7 Free';
+    font-weight: 400;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
+.fa-solid {
+    font-family: 'Font Awesome 7 Free';
+    font-weight: 900;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
 .panel {
     width: 100%;
     max-width: 430px;

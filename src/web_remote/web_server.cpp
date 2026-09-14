@@ -1,13 +1,12 @@
 #include <config.h>
 
 #include <web_remote/assets/css/index.css.h>
-#include <web_remote/assets/css/fontawesome.min.css.h>
 #include <web_remote/assets/css/regular.min.css.h>
 #include <web_remote/assets/css/solid.min.css.h>
 #include <web_remote/assets/index.html.h>
 #include <web_remote/assets/index.js.h>
-#include <web_remote/assets/webfonts/fa-regular-400.woff2.h>
-#include <web_remote/assets/webfonts/fa-solid-900.woff2.h>
+#include <web_remote/assets/webfonts/fa-regular-custom.woff2.h>
+#include <web_remote/assets/webfonts/fa-solid-custom.woff2.h>
 
 #include <web_remote/web_server.h>
 
@@ -35,14 +34,6 @@ void FanControllerWebServer::initialize()
         server.send_P(200, "text/css", assets::CSS_INDEX_CSS);
     });
 
-    server.on("/css/fontawesome.min.css", HTTP_GET, []() {
-        server.send_P(200, "text/css", assets::CSS_REGULAR_MIN_CSS);
-    });
-
-    server.on("/css/fontawesome.min.css", HTTP_GET, []() {
-        server.send_P(200, "text/css", assets::CSS_FONTAWESOME_MIN_CSS);
-    });
-
     server.on("/css/regular.min.css", HTTP_GET, []() {
         server.send_P(200, "text/css", assets::CSS_REGULAR_MIN_CSS);
     });
@@ -51,12 +42,12 @@ void FanControllerWebServer::initialize()
         server.send_P(200, "text/css", assets::CSS_SOLID_MIN_CSS);
     });
 
-    server.on("/webfonts/fa-regular-400.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_REGULAR_400_WOFF2);
+    server.on("/webfonts/fa-regular-custom.woff2", HTTP_GET, []() {
+        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2);
     });
 
-    server.on("/webfonts/fa-solid-900.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_SOLID_900_WOFF2);
+    server.on("/webfonts/fa-solid-custom.woff2", HTTP_GET, []() {
+        server.send_P(200, "font/woff2", assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2);
     });
 
     // API endpoints

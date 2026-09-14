@@ -16,7 +16,7 @@ assets_target_dir.mkdir(parents=True, exist_ok=True)
 
 
 def ignore_file(path: Path):
-    return path.name in ["LICENSE.txt"]
+    return path.name in ["LICENSE.txt", "Readme.md"]
 
 
 def process_assets():

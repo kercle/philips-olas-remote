@@ -26,15 +26,30 @@ body {
     padding: 24px;
 }
 
+.fa-regular {
+    font-family: 'Font Awesome 7 Free';
+    font-weight: 400;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
+.fa-solid {
+    font-family: 'Font Awesome 7 Free';
+    font-weight: 900;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
 .panel {
-    border: 1px solid red;
     width: 100%;
     max-width: 430px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 15px;
+    gap: 24px;
 }
 
 .light-on-off-panel {
@@ -43,7 +58,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 24px;
-    border: 1px solid red;
     width: 100%;
 }
 
@@ -52,6 +66,10 @@ h1 {
     margin: 0 0 30px;
     text-align: center;
     font-weight: 600;
+}
+
+.button-icon {
+    margin-right: 12px;
 }
 
 button {
@@ -67,13 +85,54 @@ button {
 
     background: #303030;
     color: white;
+    filter: brightness(1);
 
     -webkit-tap-highlight-color: transparent;
 }
 
 button:active {
     transform: scale(0.98);
-    background: #444;
+    transition: 0.1s ease, fill 0.1s ease;
+    filter: brightness(1.2);
+}
+
+.fan-btn {
+    fill: #303030;
+    filter: brightness(1);
+    -webkit-tap-highlight-color: transparent;
+    transform-box: fill-box;
+    transform-origin: center;
+
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.fan-btn .fan-btn-shape {
+    fill: #2A3A54;
+    transition: fill 0.1s ease;
+}
+
+.fan-btn .fan-btn-label {
+    fill: white;
+    font-size: 7px;
+    font-weight: 600;
+    font-family: sans-serif;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none; 
+}
+
+.fan-btn-label .fa-icon {
+    font-family: "Font Awesome 7 Free";
+    font-weight: 900;
+    font-size: 12px;
+}
+
+.fan-btn:active {
+    transform: scale(0.98);
+    filter: brightness(1.2);
+    transition: 0.1s ease, fill 0.1s ease;
 }
 
 .light-on {
@@ -82,7 +141,6 @@ button:active {
 }
 
 #status {
-    margin-top: 25px;
     height: 24px;
     text-align: center;
     color: #999;
