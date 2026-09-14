@@ -76,7 +76,7 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
 
        The entire over-the-air payload is our 62-byte waveform.
     */
-    state = radio.fixedPacketLengthMode(config::waveform_bytes);
+    state = radio.fixedPacketLengthMode(WaveformBuffer::capacity_bytes());
     if (state != RADIOLIB_ERR_NONE) {
         return RadioTransmitterInitResult::err(state);
     }
@@ -85,7 +85,7 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
     return RadioTransmitterInitResult::ok();
 }
 
-void RadioTransmitter::encode_bit(BitSequence<config::waveform_bytes>& waveform, bool bit)
+void RadioTransmitter::encode_bit(WaveformBuffer& waveform, bool bit)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -100,7 +100,7 @@ void RadioTransmitter::encode_bit(BitSequence<config::waveform_bytes>& waveform,
     }
 }
 
-void RadioTransmitter::encode_sync_signal(BitSequence<config::waveform_bytes>& waveform)
+void RadioTransmitter::encode_sync_signal(WaveformBuffer& waveform)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -110,7 +110,7 @@ void RadioTransmitter::encode_sync_signal(BitSequence<config::waveform_bytes>& w
     waveform.push_repeated(false, config::sync_off_bits);
 }
 
-void RadioTransmitter::build_waveform(BitSequence<config::waveform_bytes>& waveform, Command cmd)
+void RadioTransmitter::build_waveform(WaveformBuffer& waveform, Command cmd)
 {
     encode_sync_signal(waveform);
     auto frame = frame_builder.build(cmd);
@@ -120,9 +120,12 @@ void RadioTransmitter::build_waveform(BitSequence<config::waveform_bytes>& wavef
     }
 }
 
-bool RadioTransmitter::transmit_waveform(BitSequence<config::waveform_bytes>& waveform)
+bool RadioTransmitter::transmit_waveform(WaveformBuffer& waveform)
 {
-    int16_t state = radio.startTransmit(waveform.get_raw(), config::waveform_bytes);
+    int16_t state = radio.startTransmit(
+        waveform.get_raw(),
+        WaveformBuffer::capacity_bytes());
+
     if (state != RADIOLIB_ERR_NONE) {
         return false;
     }
@@ -152,7 +155,7 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
         return false;
     }
 
-    BitSequence<config::waveform_bytes> waveform;
+    WaveformBuffer waveform;
     build_waveform(waveform, cmd);
 
     for (uint8_t i = 0; i < repeats; ++i) {

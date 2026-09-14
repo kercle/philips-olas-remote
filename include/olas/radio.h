@@ -53,6 +53,10 @@ public:
     {
         return data;
     }
+
+    constexpr static unsigned capacity_bytes() {
+        return N_BYTES;
+    }
 };
 
 class RadioTransmitterInitResult {
@@ -69,6 +73,8 @@ public:
     int16_t code() const;
 };
 
+typedef BitSequence<config::waveform_bytes> WaveformBuffer;
+
 class RadioTransmitter {
     FrameBuilder& frame_builder;
 
@@ -77,11 +83,11 @@ class RadioTransmitter {
 
     bool initialized;
 
-    void encode_bit(BitSequence<config::waveform_bytes>& waveform, bool bit);
-    void encode_sync_signal(BitSequence<config::waveform_bytes>& waveform);
-    void build_waveform(BitSequence<config::waveform_bytes>& waveform, Command cmd);
+    void encode_bit(WaveformBuffer& waveform, bool bit);
+    void encode_sync_signal(WaveformBuffer& waveform);
+    void build_waveform(WaveformBuffer& waveform, Command cmd);
 
-    bool transmit_waveform(BitSequence<config::waveform_bytes>& waveform);
+    bool transmit_waveform(WaveformBuffer& waveform);
 
 public:
     RadioTransmitter(FrameBuilder& frame_builder);
