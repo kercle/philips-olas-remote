@@ -58,9 +58,15 @@ void Controller::fan_off()
     transmitter.transmit_bursts(Command::FanOff, bursts);
 }
 
-void Controller::increase_brightness(uint8_t steps) { }
+void Controller::increase_brightness(uint8_t steps)
+{
+    transmitter.transmit_bursts(Command::LightBrightnessUp, bursts);
+}
 
-void Controller::decrease_brightness(uint8_t steps) { }
+void Controller::decrease_brightness(uint8_t steps)
+{
+    transmitter.transmit_bursts(Command::LightBrightnessDown, bursts);
+}
 
 void Controller::sleep_wind()
 {
