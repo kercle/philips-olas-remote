@@ -102,6 +102,15 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
         <button class="off" onclick="sendCommand('/api/fan/off')">
             Fan Off
         </button>
+        <button class="off" onclick="sendCommand('/api/fan/1')">
+            Fan 1
+        </button>
+        <button class="off" onclick="sendCommand('/api/fan/3')">
+            Fan 3
+        </button>
+        <button class="off" onclick="sendCommand('/api/fan/6')">
+            Fan 6
+        </button>
         <div id="status"></div>
     </div>
     <script>
