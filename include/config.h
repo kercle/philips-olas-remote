@@ -4,6 +4,8 @@
 #define PIN_GDO0 4
 #define PIN_GDO2 5
 
+namespace config {
+
 // Radio configuration
 constexpr float RF_FREQUENCY_MHZ = 433.920f;
 constexpr float RAW_BITRATE_KBPS = 9.323f;
@@ -17,4 +19,7 @@ constexpr unsigned LONG_BITS  = 7;
 constexpr unsigned WAVEFORM_BYTES = 62;
 
 // Web server configuration
+static const char hostname[] = "philips-olas-remote";
 constexpr unsigned TASK_EXECUTION_WAIT_PERIOD = 50; // milliseconds
+
+}

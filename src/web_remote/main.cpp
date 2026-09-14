@@ -15,9 +15,9 @@ olas::Controller controller(FAN_ID);
 void setup_wifi()
 {
     WiFi.mode(WIFI_STA);
-    WiFi.hostname("philips-olas-remote");
+    WiFi.hostname(config::hostname);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
-    MDNS.begin("philips-olas-remote");
+    MDNS.begin(config::hostname);
 
     Serial.print(F("Connecting to Wi-Fi"));
     while (WiFi.status() != WL_CONNECTED) {

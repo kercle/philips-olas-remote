@@ -178,7 +178,7 @@ void FanControllerWebServer::schedule(const char* msg, CmdFn fn)
 
 std::optional<CmdFn> FanControllerWebServer::take_task()
 {
-    if (millis() - task_added < TASK_EXECUTION_WAIT_PERIOD) {
+    if (millis() - task_added < config::TASK_EXECUTION_WAIT_PERIOD) {
         return std::nullopt;
     }
 

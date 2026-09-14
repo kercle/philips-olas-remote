@@ -77,11 +77,11 @@ class RadioTransmitter {
 
     bool initialized;
 
-    void encode_bit(BitSequence<WAVEFORM_BYTES>& waveform, bool bit);
-    void encode_sync_signal(BitSequence<WAVEFORM_BYTES>& waveform);
-    void build_waveform(BitSequence<WAVEFORM_BYTES>& waveform, Command cmd);
+    void encode_bit(BitSequence<config::WAVEFORM_BYTES>& waveform, bool bit);
+    void encode_sync_signal(BitSequence<config::WAVEFORM_BYTES>& waveform);
+    void build_waveform(BitSequence<config::WAVEFORM_BYTES>& waveform, Command cmd);
 
-    bool transmit_waveform(BitSequence<WAVEFORM_BYTES>& waveform);
+    bool transmit_waveform(BitSequence<config::WAVEFORM_BYTES>& waveform);
 
 public:
     RadioTransmitter(FrameBuilder& frame_builder);
