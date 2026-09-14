@@ -19,6 +19,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
 
     <title>Ceiling Fan</title>
 
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/regular.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
