@@ -28,12 +28,20 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
 <body>
     <div class="panel">
         <h1>Ceiling Fan</h1>
-        <div class="light-on-off-panel">
-            <button class="off" onclick="sendCommand('/api/light/off')">
-                <i class="fa-regular button-icon">&#xf185;</i>Light Off
+        <div class="horizontal-panel">
+            <button onclick="sendCommand('/api/light/off')">
+                <i class="fa-regular button-icon">&#xf0eb;</i>Light Off
             </button>
             <button class="light-on" onclick="sendCommand('/api/light/on')">
-                <i class="fa-solid button-icon">&#xf185;</i>Light On
+                <i class="fa-solid button-icon">&#xf0eb;</i>Light On
+            </button>
+        </div>
+        <div class="horizontal-panel">
+            <button onclick="sendCommand('/api/light/dim')">
+                <i class="fa-regular button-icon">&#xf185;</i>Dimmer
+            </button>
+            <button  onclick="sendCommand('/api/light/brighten')">
+                <i class="fa-solid button-icon">&#xf185;</i>Brighter
             </button>
         </div>
         <div style="width: 100%;">
@@ -81,7 +89,14 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
                     <text x="97.56" y="36.86" class="fan-btn-label">4</text>
                 </g>
             </svg>
-
+        </div>
+        <div class="horizontal-panel">
+            <button onclick="sendCommand('/api/sleep_wind')">
+                <i class="fa-solid button-icon">&#xf6c3;</i>Sleep wind
+            </button>
+            <button onclick="sendCommand('/api/reverse_direction')">
+                <i class="fa-solid button-icon">&#xf2f1;</i>Reverse
+            </button>
         </div>
         <div id="status"></div>
     </div>

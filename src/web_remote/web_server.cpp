@@ -58,7 +58,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/light/on"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning light on",
+            "Turning light on.",
             [](olas::Controller& ctl) {
                 ctl.light_on();
             });
@@ -66,7 +66,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/light/off"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning light off",
+            "Turning light off.",
             [](olas::Controller& ctl) {
                 ctl.light_off();
             });
@@ -74,7 +74,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/off"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning off fan",
+            "Turning fan off.",
             [](olas::Controller& ctl) {
                 ctl.fan_off();
             });
@@ -82,7 +82,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/1"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 1",
+            "Turning on fan with speed 1.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(1);
             });
@@ -90,7 +90,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/2"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 2",
+            "Turning on fan with speed 2.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(2);
             });
@@ -98,7 +98,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/3"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 3",
+            "Turning on fan with speed 3.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(3);
             });
@@ -106,7 +106,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/4"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 4",
+            "Turning on fan with speed 4.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(4);
             });
@@ -114,7 +114,7 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/5"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 5",
+            "Turning on fan with speed 5.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(5);
             });
@@ -122,9 +122,25 @@ void FanControllerWebServer::initialize()
 
     server.on(F("/api/fan/6"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
-            "Turning on fan with speed 6",
+            "Turning on fan with speed 6.",
             [](olas::Controller& ctl) {
                 ctl.fan_on(6);
+            });
+    });
+
+    server.on(F("/api/sleep_wind"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Sleep wind activated.",
+            [](olas::Controller& ctl) {
+                ctl.sleep_wind();
+            });
+    });
+
+    server.on(F("/api/reverse_direction"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Reversing direction.",
+            [](olas::Controller& ctl) {
+                ctl.reverse_direction();
             });
     });
 

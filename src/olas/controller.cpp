@@ -9,7 +9,8 @@ Controller::Controller(uint32_t fan_id, uint8_t bursts)
 {
 }
 
-RadioTransmitterInitResult Controller::initialize() {
+RadioTransmitterInitResult Controller::initialize()
+{
     return transmitter.initialize();
 }
 
@@ -60,5 +61,15 @@ void Controller::fan_off()
 void Controller::increase_brightness(uint8_t steps) { }
 
 void Controller::decrease_brightness(uint8_t steps) { }
+
+void Controller::sleep_wind()
+{
+    transmitter.transmit_bursts(Command::SleepWind, bursts);
+}
+
+void Controller::reverse_direction()
+{
+    transmitter.transmit_bursts(Command::ReverseDirection, bursts);
+}
 
 }

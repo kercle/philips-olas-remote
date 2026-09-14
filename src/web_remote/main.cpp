@@ -66,4 +66,6 @@ void loop()
 
     web_server.handle_client();
     yield();
+
+    delay(10);
 }

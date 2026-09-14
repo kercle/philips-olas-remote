@@ -22,6 +22,9 @@ public:
 
     void increase_brightness(uint8_t steps);
     void decrease_brightness(uint8_t steps);
+
+    void sleep_wind();
+    void reverse_direction();
 };
 
 }
