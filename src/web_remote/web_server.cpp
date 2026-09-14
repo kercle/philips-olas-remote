@@ -64,6 +64,14 @@ void FanControllerWebServer::initialize()
             });
     });
 
+    server.on(F("/api/light/off"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning light off.",
+            [](olas::Controller& ctl) {
+                ctl.light_off();
+            });
+    });
+
     server.on(F("/api/light/dim"), HTTP_POST, []() {
         FanControllerWebServer::get_instance().schedule(
             "Dimming light.",
