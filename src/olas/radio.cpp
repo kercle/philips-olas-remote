@@ -131,6 +131,9 @@ bool RadioTransmitter::transmit_waveform(BitSequence<WAVEFORM_BYTES>& waveform)
     // 496 / 9323 bits/s ~= 53.2 ms
     // This mean that if we wait 57 ms, we cannot flood the CC1101
     // With frames essentially transmitting garbage.
+    // TODO: maybe something more generalizable to async envs
+    // e.g. a function that checks if this time has passed and
+    // lets the caller decide if to delay or not.
     delay(57);
 
     // CC1101 should now be in IDLE state.

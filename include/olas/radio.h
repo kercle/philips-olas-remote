@@ -38,13 +38,15 @@ public:
         return true;
     }
 
-    void push_repeated(bool bit, unsigned count)
+    bool push_repeated(bool bit, unsigned count)
     {
         for (unsigned i = 0; i < count; ++i) {
             if (!push(bit)) {
                 return false;
             }
         }
+
+        return true;
     }
 
     const uint8_t* get_raw() const
