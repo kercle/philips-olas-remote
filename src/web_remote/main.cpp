@@ -16,7 +16,7 @@ CC1101 radio = new Module(PIN_CS, PIN_GDO0, RADIOLIB_NC, PIN_GDO2);
 olas::FrameBuilder frame_builder(FAN_ID, 0);
 olas::RadioTransmitter transmitter(frame_builder, radio);
 
-void assert_not_err(int16_t state, const __FlashStringHelper* msg)
+void assert_no_err(int16_t state, const __FlashStringHelper* msg)
 {
     if (state != RADIOLIB_ERR_NONE) {
         Serial.print(F("CC1101 begin failed: "));
@@ -28,11 +28,11 @@ void assert_not_err(int16_t state, const __FlashStringHelper* msg)
 
 void setup_radio()
 {
-    assert_not_err(
+    assert_no_err(
         radio.begin(RF_FREQUENCY_MHZ, RAW_BITRATE_KBPS, 5.0, 325.0, 10, 16),
         F("CC1101 begin failed: "));
 
-    assert_not_err(
+    assert_no_err(
         radio.setOOK(true),
         F("setOOK failed: "));
 
@@ -44,12 +44,12 @@ void setup_radio()
        RadioLib CC1101 implementation it disables automatic
        sync-word insertion and disables CRC.
     */
-    assert_not_err(
+    assert_no_err(
         radio.setPromiscuousMode(true),
         F("setPromiscuousMode failed: "));
 
     // No address byte.
-    assert_not_err(
+    assert_no_err(
         radio.disableAddressFiltering(),
         F("disableAddressFiltering failed: "));
 
@@ -59,7 +59,7 @@ void setup_radio()
 
        The entire over-the-air payload is our 62-byte waveform.
     */
-    assert_not_err(
+    assert_no_err(
         radio.fixedPacketLengthMode(WAVEFORM_BYTES),
         F("fixedPacketLengthMode failed: "));
 }

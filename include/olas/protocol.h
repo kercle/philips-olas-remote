@@ -25,6 +25,22 @@ enum Command {
     LightOff = 0xBC,
 };
 
+class Frame {
+    friend class FrameBuilder;
+
+    uint64_t data;
+
+    Frame(uint64_t data);
+
+public:
+    bool get_frame_bit(int8_t msb_first_pos) const;
+
+    constexpr uint8_t bit_size()
+    {
+        return 41;
+    }
+};
+
 class FrameBuilder {
     uint32_t fan_id;
     uint8_t frame_counter;
@@ -32,7 +48,7 @@ class FrameBuilder {
 public:
     FrameBuilder(uint32_t fan_id, uint8_t init_frame_counter);
 
-    uint64_t build(Command cmd);
+    Frame build(Command cmd);
 };
 
 }

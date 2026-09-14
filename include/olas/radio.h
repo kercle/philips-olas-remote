@@ -2,6 +2,7 @@
 
 #include <RadioLib.h>
 
+#include <config.h>
 #include <olas/protocol.h>
 
 namespace olas {
@@ -41,14 +42,27 @@ public:
             push(bit);
         }
     }
+
+    const uint8_t* get_raw() const {
+        return data;
+    }
 };
 
 class RadioTransmitter {
     FrameBuilder& frame_builder;
     CC1101 radio;
 
+    void encode_bit(BitSequence<WAVEFORM_BYTES>& waveform, bool bit);
+    void encode_sync_signal(BitSequence<WAVEFORM_BYTES>& waveform);
+    void build_waveform(BitSequence<WAVEFORM_BYTES>& waveform, Command cmd);
+
+    bool transmit_waveform(BitSequence<WAVEFORM_BYTES>& waveform);
+
 public:
     RadioTransmitter(FrameBuilder& frame_builder, CC1101 radio);
+
+    bool transmit(Command cmd);
+    bool transmit_bursts(Command cmd, uint8_t repeats);
 };
 
 }

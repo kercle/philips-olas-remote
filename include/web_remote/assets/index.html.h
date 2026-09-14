@@ -7,7 +7,7 @@ namespace assets {
 const char INDEX_HTML[] PROGMEM = R"rawliteral(
 <html>
     <body>
-        <p>"Hello world!</p>
+        <p>Hello world!</p>
     </body>
 </html>
 
