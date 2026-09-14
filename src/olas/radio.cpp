@@ -44,7 +44,7 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
 
     int16_t state = 0;
 
-    state = radio.begin(config::RF_FREQUENCY_MHZ, config::RAW_BITRATE_KBPS, 5.0, 325.0, 10, 16);
+    state = radio.begin(config::rf_frequency_mhz, config::raw_bitrate_kbps, 5.0, 325.0, 10, 16);
     if (state != RADIOLIB_ERR_NONE) {
         return RadioTransmitterInitResult::err(state);
     }
@@ -76,7 +76,7 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
 
        The entire over-the-air payload is our 62-byte waveform.
     */
-    state = radio.fixedPacketLengthMode(config::WAVEFORM_BYTES);
+    state = radio.fixedPacketLengthMode(config::waveform_bytes);
     if (state != RADIOLIB_ERR_NONE) {
         return RadioTransmitterInitResult::err(state);
     }
@@ -85,32 +85,32 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
     return RadioTransmitterInitResult::ok();
 }
 
-void RadioTransmitter::encode_bit(BitSequence<config::WAVEFORM_BYTES>& waveform, bool bit)
+void RadioTransmitter::encode_bit(BitSequence<config::waveform_bytes>& waveform, bool bit)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
     // appliances.
 
     if (bit) {
-        waveform.push_repeated(true, config::LONG_BITS);
-        waveform.push_repeated(false, config::SHORT_BITS);
+        waveform.push_repeated(true, config::long_bits);
+        waveform.push_repeated(false, config::short_bits);
     } else {
-        waveform.push_repeated(true, config::SHORT_BITS);
-        waveform.push_repeated(false, config::LONG_BITS);
+        waveform.push_repeated(true, config::short_bits);
+        waveform.push_repeated(false, config::long_bits);
     }
 }
 
-void RadioTransmitter::encode_sync_signal(BitSequence<config::WAVEFORM_BYTES>& waveform)
+void RadioTransmitter::encode_sync_signal(BitSequence<config::waveform_bytes>& waveform)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
     // appliances.
 
-    waveform.push_repeated(true, config::SYNC_ON_BITS);
-    waveform.push_repeated(false, config::SYNC_OFF_BITS);
+    waveform.push_repeated(true, config::sync_on_bits);
+    waveform.push_repeated(false, config::sync_off_bits);
 }
 
-void RadioTransmitter::build_waveform(BitSequence<config::WAVEFORM_BYTES>& waveform, Command cmd)
+void RadioTransmitter::build_waveform(BitSequence<config::waveform_bytes>& waveform, Command cmd)
 {
     encode_sync_signal(waveform);
     auto frame = frame_builder.build(cmd);
@@ -120,9 +120,9 @@ void RadioTransmitter::build_waveform(BitSequence<config::WAVEFORM_BYTES>& wavef
     }
 }
 
-bool RadioTransmitter::transmit_waveform(BitSequence<config::WAVEFORM_BYTES>& waveform)
+bool RadioTransmitter::transmit_waveform(BitSequence<config::waveform_bytes>& waveform)
 {
-    int16_t state = radio.startTransmit(waveform.get_raw(), config::WAVEFORM_BYTES);
+    int16_t state = radio.startTransmit(waveform.get_raw(), config::waveform_bytes);
     if (state != RADIOLIB_ERR_NONE) {
         return false;
     }
@@ -152,7 +152,7 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
         return false;
     }
 
-    BitSequence<config::WAVEFORM_BYTES> waveform;
+    BitSequence<config::waveform_bytes> waveform;
     build_waveform(waveform, cmd);
 
     for (uint8_t i = 0; i < repeats; ++i) {

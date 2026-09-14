@@ -7,19 +7,19 @@
 namespace config {
 
 // Radio configuration
-constexpr float RF_FREQUENCY_MHZ = 433.920f;
-constexpr float RAW_BITRATE_KBPS = 9.323f;
+constexpr float rf_frequency_mhz = 433.920f;
+constexpr float raw_bitrate_kbps = 9.323f;
 
-constexpr unsigned SYNC_ON_BITS  = 69;
-constexpr unsigned SYNC_OFF_BITS = 10;
+constexpr unsigned sync_on_bits = 69;
+constexpr unsigned sync_off_bits = 10;
 
-constexpr unsigned SHORT_BITS = 3;
-constexpr unsigned LONG_BITS  = 7;
+constexpr unsigned short_bits = 3;
+constexpr unsigned long_bits = 7;
 
-constexpr unsigned WAVEFORM_BYTES = 62;
+constexpr unsigned waveform_bytes = 62;
 
 // Web server configuration
 static const char hostname[] = "philips-olas-remote";
-constexpr unsigned TASK_EXECUTION_WAIT_PERIOD = 50; // milliseconds
+constexpr unsigned task_executition_time_gap = 50; // milliseconds
 
 }
