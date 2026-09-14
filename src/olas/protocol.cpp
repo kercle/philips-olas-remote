@@ -8,7 +8,7 @@ Frame::Frame(uint64_t data)
 
 bool Frame::get_frame_bit(int8_t msb_first_pos) const
 {
-    if (msb_first_pos > 40) {
+    if (msb_first_pos > 40 || msb_first_pos < 0) {
         return false;
     }
 
