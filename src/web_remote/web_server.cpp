@@ -17,12 +17,76 @@ void FanControllerWebServer::initialize()
         server.send_P(200, "text/html", assets::INDEX_HTML);
     });
 
-    server.on("/api/light/on", HTTP_POST, []() {
-        Serial.println(F("Turning on lights"));
-        FanControllerWebServer::get_instance().schedule([](olas::Controller& ctl) {
-            ctl.light_on();
-        },
-            "Turning on lights");
+    server.on(F("/api/light/on"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning light on",
+            [](olas::Controller& ctl) {
+                ctl.light_on();
+            });
+    });
+
+    server.on(F("/api/light/off"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning light off",
+            [](olas::Controller& ctl) {
+                ctl.light_off();
+            });
+    });
+
+    server.on(F("/api/fan/off"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning off fan",
+            [](olas::Controller& ctl) {
+                ctl.light_on();
+            });
+    });
+
+    server.on(F("/api/fan/1"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 1",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(1);
+            });
+    });
+
+    server.on(F("/api/fan/2"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 2",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(2);
+            });
+    });
+
+    server.on(F("/api/fan/3"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 3",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(3);
+            });
+    });
+
+    server.on(F("/api/fan/4"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 4",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(4);
+            });
+    });
+
+    server.on(F("/api/fan/5"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 5",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(5);
+            });
+    });
+
+    server.on(F("/api/fan/6"), HTTP_POST, []() {
+        FanControllerWebServer::get_instance().schedule(
+            "Turning on fan with speed 6",
+            [](olas::Controller& ctl) {
+                ctl.fan_on(6);
+            });
     });
 
     server.onNotFound([]() {
@@ -32,7 +96,7 @@ void FanControllerWebServer::initialize()
     server.begin();
 }
 
-void FanControllerWebServer::schedule(CmdFn fn, const char* msg)
+void FanControllerWebServer::schedule(const char* msg, CmdFn fn)
 {
     if (task.has_value()) {
         server.send(

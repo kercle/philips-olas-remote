@@ -14,6 +14,7 @@ class FanControllerWebServer {
     uint64_t task_added;
 
     FanControllerWebServer() = default;
+
 public:
     FanControllerWebServer(const FanControllerWebServer&) = delete;
     FanControllerWebServer& operator=(const FanControllerWebServer&) = delete;
@@ -22,7 +23,7 @@ public:
 
     void initialize();
 
-    void schedule(CmdFn fn, const char *msg);
+    void schedule(const char* msg, CmdFn fn);
     std::optional<CmdFn> take_task();
 
     void handle_client();
