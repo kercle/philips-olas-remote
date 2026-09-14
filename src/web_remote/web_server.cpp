@@ -37,7 +37,7 @@ void FanControllerWebServer::initialize()
         FanControllerWebServer::get_instance().schedule(
             "Turning off fan",
             [](olas::Controller& ctl) {
-                ctl.light_on();
+                ctl.fan_off();
             });
     });
 
