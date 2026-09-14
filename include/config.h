@@ -20,6 +20,6 @@ constexpr unsigned waveform_bytes = 62;
 
 // Web server configuration
 static const char hostname[] = "philips-olas-remote";
-constexpr unsigned task_executition_time_gap = 50; // milliseconds
+constexpr unsigned task_execution_time_gap = 50; // milliseconds
 
 }
