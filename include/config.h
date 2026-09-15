@@ -1,12 +1,12 @@
 #pragma once
 
-#define PIN_CS 15
-#define PIN_GDO0 4
-#define PIN_GDO2 5
-
 namespace config {
 
 // Radio configuration
+constexpr unsigned char pin_cs = 15;
+constexpr unsigned char pin_gdo0 = 4;
+constexpr unsigned char pin_gdo2 = 5;
+
 constexpr float rf_frequency_mhz = 433.920f;
 constexpr float raw_bitrate_kbps = 9.323f;
 

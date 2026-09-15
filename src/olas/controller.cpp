@@ -4,14 +4,14 @@ namespace olas {
 
 Controller::Controller(uint32_t fan_id, uint8_t bursts)
     : frame_builder(fan_id, 0)
-    , transmitter(frame_builder)
+    , transmitter()
     , bursts(bursts)
 {
 }
 
 RadioTransmitterInitResult Controller::initialize()
 {
-    return transmitter.initialize();
+    return transmitter.initialize(&frame_builder);
 }
 
 void Controller::light_on()

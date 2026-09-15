@@ -3,8 +3,8 @@
 #include <RadioLib.h>
 
 #include <config.h>
-#include <olas/protocol.h>
 #include <olas/bit_sequence.h>
+#include <olas/protocol.h>
 
 namespace olas {
 
@@ -24,8 +24,12 @@ public:
 
 typedef BitSequence<config::waveform_bytes> WaveformBuffer;
 
+template <uint8_t PIN_CS, uint8_t PIN_GDO0, uint8_t PIN_GDO2>
 class RadioTransmitter {
-    FrameBuilder& frame_builder;
+};
+
+class RadioTransmitterImpl {
+    FrameBuilder* frame_builder;
 
     Module radio_module;
     CC1101 radio;
@@ -39,8 +43,11 @@ class RadioTransmitter {
     bool transmit_waveform(WaveformBuffer& waveform);
 
 public:
-    RadioTransmitter(FrameBuilder& frame_builder);
-    RadioTransmitterInitResult initialize();
+    RadioTransmitterImpl(const RadioTransmitterImpl&) = delete;
+    RadioTransmitterImpl& operator=(const RadioTransmitterImpl&) = delete;
+
+    RadioTransmitterImpl();
+    RadioTransmitterInitResult initialize(FrameBuilder* frame_builder);
 
     bool transmit(Command cmd);
     bool transmit_bursts(Command cmd, uint8_t repeats);
