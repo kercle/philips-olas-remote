@@ -7,7 +7,7 @@ namespace olas {
 
 class Controller {
     olas::FrameBuilder frame_builder;
-    olas::RadioTransmitter transmitter;
+    olas::RadioTransmitterImpl transmitter;
 
     uint8_t bursts;
 public:

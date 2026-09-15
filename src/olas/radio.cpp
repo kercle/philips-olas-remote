@@ -28,15 +28,15 @@ int16_t RadioTransmitterInitResult::code() const
     return _code;
 }
 
-RadioTransmitter::RadioTransmitter(FrameBuilder& frame_builder)
-    : frame_builder(frame_builder)
-    , radio_module(PIN_CS, PIN_GDO0, RADIOLIB_NC, PIN_GDO2)
+RadioTransmitterImpl::RadioTransmitterImpl()
+    : frame_builder(nullptr)
+    , radio_module(config::pin_cs, config::pin_gdo0, RADIOLIB_NC, config::pin_gdo2)
     , radio(&radio_module)
     , initialized(false)
 {
 }
 
-RadioTransmitterInitResult RadioTransmitter::initialize()
+RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_builder)
 {
     if (initialized) {
         return RadioTransmitterInitResult::ok();
@@ -85,7 +85,7 @@ RadioTransmitterInitResult RadioTransmitter::initialize()
     return RadioTransmitterInitResult::ok();
 }
 
-void RadioTransmitter::encode_bit(WaveformBuffer& waveform, bool bit)
+void RadioTransmitterImpl::encode_bit(WaveformBuffer& waveform, bool bit)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -100,7 +100,7 @@ void RadioTransmitter::encode_bit(WaveformBuffer& waveform, bool bit)
     }
 }
 
-void RadioTransmitter::encode_sync_signal(WaveformBuffer& waveform)
+void RadioTransmitterImpl::encode_sync_signal(WaveformBuffer& waveform)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -110,17 +110,17 @@ void RadioTransmitter::encode_sync_signal(WaveformBuffer& waveform)
     waveform.push_repeated(false, config::sync_off_bits);
 }
 
-void RadioTransmitter::build_waveform(WaveformBuffer& waveform, Command cmd)
+void RadioTransmitterImpl::build_waveform(WaveformBuffer& waveform, Command cmd)
 {
     encode_sync_signal(waveform);
-    auto frame = frame_builder.build(cmd);
+    auto frame = frame_builder->build(cmd);
 
     for (uint8_t i = 0; i < frame.bit_size(); ++i) {
         encode_bit(waveform, frame.get_frame_bit(i));
     }
 }
 
-bool RadioTransmitter::transmit_waveform(WaveformBuffer& waveform)
+bool RadioTransmitterImpl::transmit_waveform(WaveformBuffer& waveform)
 {
     int16_t state = radio.startTransmit(
         waveform.get_raw(),
@@ -144,12 +144,12 @@ bool RadioTransmitter::transmit_waveform(WaveformBuffer& waveform)
     return state == RADIOLIB_ERR_NONE;
 }
 
-bool RadioTransmitter::transmit(Command cmd)
+bool RadioTransmitterImpl::transmit(Command cmd)
 {
     return transmit_bursts(cmd, 1);
 }
 
-bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
+bool RadioTransmitterImpl::transmit_bursts(Command cmd, uint8_t repeats)
 {
     if (!initialized || !repeats) {
         return false;
@@ -164,7 +164,7 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
         }
     }
 
-    frame_builder.advance_frame_counter();
+    frame_builder->advance_frame_counter();
     return true;
 }
 
