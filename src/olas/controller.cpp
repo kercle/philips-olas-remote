@@ -4,7 +4,7 @@ namespace olas {
 
 Controller::Controller(uint32_t fan_id, uint8_t bursts)
     : frame_builder(fan_id, 0)
-    , transmitter()
+    , transmitter(RadioTransmitter<config::pin_cs, config::pin_gdo0, config::pin_gdo2>::get_instance())
     , bursts(bursts)
 {
 }
