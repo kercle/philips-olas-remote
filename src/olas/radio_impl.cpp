@@ -1,4 +1,4 @@
-#include <olas/radio.h>
+#include <olas/radio_impl.h>
 
 namespace olas {
 
@@ -28,10 +28,10 @@ int16_t RadioTransmitterInitResult::code() const
     return _code;
 }
 
-RadioTransmitterImpl::RadioTransmitterImpl()
+RadioTransmitterImpl::RadioTransmitterImpl(Module& radio_module, CC1101& radio)
     : frame_builder(nullptr)
-    , radio_module(config::pin_cs, config::pin_gdo0, RADIOLIB_NC, config::pin_gdo2)
-    , radio(&radio_module)
+    , radio_module(radio_module)
+    , radio(radio)
     , initialized(false)
 {
 }

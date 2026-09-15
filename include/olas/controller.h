@@ -6,10 +6,11 @@
 namespace olas {
 
 class Controller {
-    olas::FrameBuilder frame_builder;
-    olas::RadioTransmitterImpl transmitter;
+    FrameBuilder frame_builder;
+    RadioTransmitter<config::pin_cs, config::pin_gdo0, config::pin_gdo2> &transmitter;
 
     uint8_t bursts;
+
 public:
     Controller(uint32_t fan_id, uint8_t bursts = 4);
     RadioTransmitterInitResult initialize();
