@@ -42,6 +42,8 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
         return RadioTransmitterInitResult::ok();
     }
 
+    this->frame_builder = frame_builder;
+
     int16_t state = 0;
 
     state = radio.begin(config::rf_frequency_mhz, config::raw_bitrate_kbps, 5.0, 325.0, 10, 16);
