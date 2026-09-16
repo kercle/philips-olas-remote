@@ -48,6 +48,7 @@ public:
     RadioTransmitterImpl(Module& radio_module, CC1101& radio);
 
     RadioTransmitterInitResult initialize(FrameBuilder* frame_builder);
+    bool is_initialized() const;
 
     bool transmit(Command cmd);
     bool transmit_bursts(Command cmd, uint8_t repeats);
