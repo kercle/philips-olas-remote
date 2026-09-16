@@ -87,6 +87,10 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
     return RadioTransmitterInitResult::ok();
 }
 
+bool RadioTransmitterImpl::is_initialized() const {
+    return initialized;
+}
+
 void RadioTransmitterImpl::encode_bit(WaveformBuffer& waveform, bool bit)
 {
     // TODO: don't fail silently when waveform overfills
