@@ -9,7 +9,7 @@ Controller::Controller(uint32_t fan_id, uint8_t bursts)
 {
 }
 
-RadioTransmitterInitResult Controller::initialize()
+RadioTransmitterResult Controller::initialize()
 {
     return transmitter.initialize(&frame_builder);
 }

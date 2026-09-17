@@ -13,7 +13,7 @@ class Controller {
 
 public:
     Controller(uint32_t fan_id, uint8_t bursts = 4);
-    RadioTransmitterInitResult initialize();
+    RadioTransmitterResult initialize();
 
     void light_on();
     void light_off();

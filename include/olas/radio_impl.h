@@ -10,17 +10,19 @@ namespace olas {
 
 using IsrHandler = void (*)();
 
-class RadioTransmitterInitResult {
+class RadioTransmitterResult {
     bool _ok;
     int16_t _code;
 
-    RadioTransmitterInitResult(bool _ok, int16_t _code);
+    RadioTransmitterResult(bool _ok, int16_t _code);
 
 public:
-    static RadioTransmitterInitResult ok();
-    static RadioTransmitterInitResult err(int16_t code);
+    static RadioTransmitterResult ok();
+    static RadioTransmitterResult err(int16_t code);
 
     bool is_err() const;
+    bool is_ok() const;
+
     int16_t code() const;
 };
 
@@ -54,7 +56,7 @@ class RadioTransmitterImpl {
 public:
     RadioTransmitterImpl(Module& radio_module, CC1101& radio, IsrHandler isr_handler);
 
-    RadioTransmitterInitResult initialize(FrameBuilder* frame_builder);
+    RadioTransmitterResult initialize(FrameBuilder* frame_builder);
     bool is_initialized() const;
 
     bool transmit(Command cmd);

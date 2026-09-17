@@ -41,10 +41,10 @@ RadioTransmitterImpl::RadioTransmitterImpl(Module& radio_module, CC1101& radio, 
 {
 }
 
-RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_builder)
+RadioTransmitterResult RadioTransmitterImpl::initialize(FrameBuilder* frame_builder)
 {
     if (initialized) {
-        return RadioTransmitterInitResult::ok();
+        return RadioTransmitterResult::ok();
     }
 
     this->frame_builder = frame_builder;
@@ -53,12 +53,12 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
 
     state = radio.begin(config::rf_frequency_mhz, config::raw_bitrate_kbps, 5.0, 100.0, 10, 16);
     if (state != RADIOLIB_ERR_NONE) {
-        return RadioTransmitterInitResult::err(state);
+        return RadioTransmitterResult::err(state);
     }
 
     state = radio.setOOK(true);
     if (state != RADIOLIB_ERR_NONE) {
-        return RadioTransmitterInitResult::err(state);
+        return RadioTransmitterResult::err(state);
     }
 
     //    We want the FIFO bytes to be transmitted literally.
@@ -68,13 +68,13 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
     //    sync-word insertion and disables CRC.
     state = radio.setPromiscuousMode(true);
     if (state != RADIOLIB_ERR_NONE) {
-        return RadioTransmitterInitResult::err(state);
+        return RadioTransmitterResult::err(state);
     }
 
     // No address byte.
     state = radio.disableAddressFiltering();
     if (state != RADIOLIB_ERR_NONE) {
-        return RadioTransmitterInitResult::err(state);
+        return RadioTransmitterResult::err(state);
     }
 
     /*
@@ -85,11 +85,11 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
     */
     state = radio.fixedPacketLengthMode(WaveformBuffer::capacity_bytes());
     if (state != RADIOLIB_ERR_NONE) {
-        return RadioTransmitterInitResult::err(state);
+        return RadioTransmitterResult::err(state);
     }
 
     initialized = true;
-    return RadioTransmitterInitResult::ok();
+    return RadioTransmitterResult::ok();
 }
 
 bool RadioTransmitterImpl::is_initialized() const

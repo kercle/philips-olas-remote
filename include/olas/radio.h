@@ -174,7 +174,7 @@ public:
         return instance;
     }
 
-    RadioTransmitterInitResult initialize(FrameBuilder* frame_builder)
+    RadioTransmitterResult initialize(FrameBuilder* frame_builder)
     {
         return impl.initialize(frame_builder);
     }
