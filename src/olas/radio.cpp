@@ -104,11 +104,11 @@ RadioTransmitterResult RadioTransmitter::start_receiving()
     }
 
     pinMode(radio_module.getGpio(), INPUT);
-    // attachInterruptArg(
-    //     digitalPinToInterrupt(radio_module.getGpio()),
-    //     isr_handler,
-    //     nullptr,
-    //     CHANGE);
+    attachInterruptArg(
+        digitalPinToInterrupt(radio_module.getIrq()),
+        RadioRxState::handle_edge,
+        static_cast<void*>(&rx_state),
+        CHANGE);
 
     receiving = true;
     return RadioTransmitterResult::ok();
@@ -268,6 +268,9 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
 }
 
 std::optional<Frame> RadioTransmitter::receive_frame() {
+    // Serial.print("Last edge time: ");
+    // Serial.print(rx_state.last_edge_time);
+
     auto frame_raw = rx_state.frame_data_queue.pop();
 
     if (!frame_raw.has_value()) {
@@ -343,7 +346,7 @@ void IRAM_ATTR RadioRxState::update_state(RadioRxState* self, EdgeClass cls)
         break;
     }
 
-    if (self->current_frame_size == 1) {
+    if (self->current_frame_size == 40) {
         // From experimentation: The last bit is often incompletely
         // sent. We just stop here and assume it to be 0.
 
