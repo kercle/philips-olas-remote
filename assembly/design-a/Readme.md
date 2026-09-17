@@ -3,7 +3,7 @@
 This is a simple designed based around a prototyping board, a NodeMcu Mini D1 Module (with Esp8266, but Esp32 should also work) and a CC1101 wireless module.
 | Fully assembled | PCB in case |
 |:-:|:-:|
-| ![Fully assembled](assets/fully-assembled.png) | TODO |
+| ![Fully assembled](assets/fully-assembled.png) | ![PCB in case](assets/pcb-in-case.jpg) |
 
 ## BOM
 
