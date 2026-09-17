@@ -23,15 +23,8 @@ bool current_edge_levels[BUFFER_CAPACITY];
 
 uint16_t edges_in_row = 0;
 
-CC1101 radio = new Module(PIN_CS, PIN_GDO0, RADIOLIB_NC, PIN_GDO2);
-
-void write_cc1101_reg(uint8_t addr, uint8_t value)
-{
-    digitalWrite(PIN_CS, LOW);
-    SPI.transfer(addr);
-    SPI.transfer(value);
-    digitalWrite(PIN_CS, HIGH);
-}
+Module radio_module(PIN_CS, PIN_GDO0, RADIOLIB_NC, PIN_GDO2);
+CC1101 radio(&radio_module);
 
 void IRAM_ATTR on_edge()
 {
@@ -65,8 +58,8 @@ void setup()
     radio.setOOK(true);
     radio.startReceive();
 
-    write_cc1101_reg(CC1101_REG_IOCFG0, 0x0D);
-    write_cc1101_reg(CC1101_REG_PKTCTRL0, 0x32);
+    radio_module.SPIwriteRegister(CC1101_REG_IOCFG0, 0x0D);
+    radio_module.SPIwriteRegister(CC1101_REG_PKTCTRL0, 0x32);
 
     pinMode(PIN_GDO0, INPUT);
     attachInterrupt(digitalPinToInterrupt(PIN_GDO0), on_edge, CHANGE);
