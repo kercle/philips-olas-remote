@@ -87,22 +87,31 @@ enum class EdgeClass : uint8_t {
 EdgeClass filter(uint64_t duration, bool carrier_on)
 {
     constexpr float p = 0.15;
+    constexpr uint32_t window_width = 140;
 
     constexpr uint64_t short_duration = 340;
-    constexpr uint64_t short_lower_bound = short_duration * (1.0 - p);
-    constexpr uint64_t short_upper_bound = short_duration * (1.0 + p);
+    // constexpr uint64_t short_lower_bound = short_duration * (1.0 - p);
+    // constexpr uint64_t short_upper_bound = short_duration * (1.0 + p);
+    constexpr uint64_t short_lower_bound = short_duration - window_width / 2;
+    constexpr uint64_t short_upper_bound = short_duration + window_width / 2;
 
     constexpr uint64_t long_duration = 730;
-    constexpr uint64_t long_lower_bound = long_duration * (1.0 - p);
-    constexpr uint64_t long_upper_bound = long_duration * (1.0 + p);
+    // constexpr uint64_t long_lower_bound = long_duration * (1.0 - p);
+    // constexpr uint64_t long_upper_bound = long_duration * (1.0 + p);
+    constexpr uint64_t long_lower_bound = long_duration - window_width / 2;
+    constexpr uint64_t long_upper_bound = long_duration + window_width / 2;
 
     constexpr uint64_t sync_on_duration = 7400;
-    constexpr uint64_t sync_on_lower_bound = sync_on_duration * (1.0 - p);
-    constexpr uint64_t sync_on_upper_bound = sync_on_duration * (1.0 + p);
+    // constexpr uint64_t sync_on_lower_bound = sync_on_duration * (1.0 - p);
+    // constexpr uint64_t sync_on_upper_bound = sync_on_duration * (1.0 + p);
+    constexpr uint64_t sync_on_lower_bound = sync_on_duration - window_width / 2;
+    constexpr uint64_t sync_on_upper_bound = sync_on_duration + window_width / 2;
 
     constexpr uint64_t sync_off_duration = 1090;
-    constexpr uint64_t sync_off_lower_bound = sync_off_duration * (1.0 - p);
-    constexpr uint64_t sync_off_upper_bound = sync_off_duration * (1.0 + p);
+    // constexpr uint64_t sync_off_lower_bound = sync_off_duration * (1.0 - p);
+    // constexpr uint64_t sync_off_upper_bound = sync_off_duration * (1.0 + p);
+    constexpr uint64_t sync_off_lower_bound = sync_off_duration - window_width / 2;
+    constexpr uint64_t sync_off_upper_bound = sync_off_duration + window_width / 2;
 
     if (short_lower_bound <= duration && duration <= short_upper_bound) {
         return carrier_on
