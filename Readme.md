@@ -114,3 +114,13 @@ In order to be able to send precise signals while not being disturbed by WiFi in
 These timings are close enough for the fan to register them. Since one frame contains 41 bits and each bit is encoded by 10 bits in the FIFO queue (`3 (short) + 7 (long)`) we need `69 (sync on) + 10 (sync off) + 41 (bits per frame) × 10 = 489` bits corresponding to 62 bytes in the FIFO queue. This means that we can send exactly one command to the fan via the FIFO queue without manual timing efforts.
 
 This massively simplifies the communication, since now we don't have to worry about timing anymore.
+
+## Web-interface
+
+The firmware spawns a web server that can be used to access the fan controls via e.g. mobile devices within the local network. Note that at the time of writing, the web interface is not protected by any authentication.
+
+![Web interface](./assets/web-interface.png)
+
+## Assembly
+
+A small complete assembly is [provided in this repository](./assembly/design-a), complete with a 3D-printable case and a list of components needed for the assembly. The remote is powered via USB.
