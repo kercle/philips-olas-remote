@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <optional>
 
 namespace olas {
 
@@ -30,15 +31,20 @@ class Frame {
 
     uint64_t data;
 
+    bool is_valid() const;
     Frame(uint64_t data);
 
 public:
     bool get_frame_bit(int8_t msb_first_pos) const;
 
+    static std::optional<Frame> from_data(uint64_t data);
+
     constexpr uint8_t bit_size()
     {
         return 41;
     }
+
+    Command get_command() const;
 };
 
 class FrameBuilder {

@@ -6,8 +6,11 @@
 #include <olas/bit_sequence.h>
 #include <olas/protocol.h>
 #include <olas/radio_impl.h>
+#include <olas/ring_buffer.h>
 
 namespace olas {
+
+constexpr size_t ring_buffer_size = 64;
 
 // State machine for receiving signals:
 // Transitions:
@@ -24,6 +27,16 @@ enum class RecvState : uint8_t {
     ExpectShortOff,
 };
 
+enum class EdgeClass : uint8_t {
+    ShortOn,
+    ShortOff,
+    LongOn,
+    LongOff,
+    SyncOn,
+    SyncOff,
+    Unknown,
+};
+
 template <uint8_t PIN_CS, uint8_t PIN_GDO0, uint8_t PIN_GDO2>
 class RadioTransmitter {
     Module radio_module;
@@ -31,7 +44,12 @@ class RadioTransmitter {
     RadioTransmitterImpl impl;
 
     bool receiving;
-    volatile uint64_t last_edge_time;
+
+    inline static volatile uint32_t last_edge_time = 0;
+    inline static volatile RecvState current_state = RecvState::SeekingSyncOn;
+    inline static volatile uint64_t current_frame = 0;
+    inline static volatile uint8_t current_frame_size = 0;
+    inline static volatile RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
 
     static constexpr uint8_t cc1101_reg_iocfg0 = 0x02;
     static constexpr uint8_t cc1101_reg_pktctrl0 = 0x08;
@@ -52,10 +70,114 @@ class RadioTransmitter {
         digitalWrite(PIN_CS, HIGH);
     }
 
+    static void IRAM_ATTR reset_state_machine()
+    {
+        current_state = RecvState::SeekingSyncOn;
+        current_frame = 0;
+        current_frame_size = 0;
+    }
+
+    static void IRAM_ATTR update_state(EdgeClass cls)
+    {
+        if (cls == EdgeClass::SyncOn) {
+            current_frame = 0;
+            current_frame_size = 0;
+            current_state = RecvState::ExpectSyncOff;
+            return;
+        }
+
+        switch (current_state) {
+        case RecvState::SeekingSyncOn:
+            // unreachable
+            break;
+        case RecvState::ExpectSyncOff:
+            if (cls == EdgeClass::SyncOff) {
+                current_state = RecvState::AwaitSymbolOn;
+            } else {
+                RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::reset_state_machine();
+            }
+            break;
+        case RecvState::AwaitSymbolOn:
+            if (cls == EdgeClass::ShortOn) {
+                current_state = RecvState::ExpectLongOff;
+            } else if (cls == EdgeClass::LongOn) {
+                current_state = RecvState::ExpectShortOff;
+            } else {
+                RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::reset_state_machine();
+            }
+            break;
+        case RecvState::ExpectLongOff:
+            if (cls == EdgeClass::LongOff) {
+                current_frame <<= 1;
+                ++current_frame_size;
+
+                current_state = RecvState::AwaitSymbolOn;
+            } else {
+                RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::reset_state_machine();
+            }
+            break;
+        case RecvState::ExpectShortOff:
+            if (cls == EdgeClass::ShortOff) {
+                current_frame = (current_frame << 1) | 1;
+                ++current_frame_size;
+
+                current_state = RecvState::AwaitSymbolOn;
+            } else {
+                RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::reset_state_machine();
+            }
+            break;
+        }
+
+        if (current_frame_size == 40) {
+            // From experimentation: The last bit is often incompletely
+            // sent. We just stop here and assume it to be 0.
+
+            frame_data_queue.push(current_frame << 1);
+            RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::reset_state_machine();
+        }
+    }
+
     static void IRAM_ATTR handle_edge()
     {
-        uint64_t now = micros();
-        // TODO
+        uint32_t now = micros();
+        auto duration = now - last_edge_time;
+        last_edge_time = now;
+
+        auto gpio_level_after_edge = digitalRead(PIN_GDO0);
+        auto carrier_on = !gpio_level_after_edge;
+
+        constexpr uint32_t short_lower_bound = config::median_short_pulse_duration - config::timing_window_width / 2;
+        constexpr uint32_t short_upper_bound = config::median_short_pulse_duration + config::timing_window_width / 2;
+
+        constexpr uint32_t long_lower_bound = config::median_long_pulse_duration - config::timing_window_width / 2;
+        constexpr uint32_t long_upper_bound = config::median_long_pulse_duration + config::timing_window_width / 2;
+
+        constexpr uint32_t sync_on_lower_bound = config::median_sync_on_duration - config::timing_window_width / 2;
+        constexpr uint32_t sync_on_upper_bound = config::median_sync_on_duration + config::timing_window_width / 2;
+
+        constexpr uint32_t sync_off_lower_bound = config::median_sync_off_duration - config::timing_window_width / 2;
+        constexpr uint32_t sync_off_upper_bound = config::median_sync_off_duration + config::timing_window_width / 2;
+
+        EdgeClass cls = EdgeClass::Unknown;
+        if (short_lower_bound <= duration && duration <= short_upper_bound) {
+            cls = carrier_on
+                ? EdgeClass::ShortOn
+                : EdgeClass::ShortOff;
+        } else if (long_lower_bound <= duration && duration <= long_upper_bound) {
+            cls = carrier_on
+                ? EdgeClass::LongOn
+                : EdgeClass::LongOff;
+        } else if (sync_on_lower_bound <= duration && duration <= sync_on_upper_bound) {
+            cls = carrier_on
+                ? EdgeClass::SyncOn
+                : EdgeClass::Unknown;
+        } else if (sync_off_lower_bound <= duration && duration <= sync_off_upper_bound) {
+            cls = carrier_on
+                ? EdgeClass::Unknown
+                : EdgeClass::SyncOff;
+        }
+
+        RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::update_state(cls);
     }
 
 public:
