@@ -9,6 +9,21 @@
 
 namespace olas {
 
+// State machine for receiving signals:
+// Transitions:
+//   SeekingSyncOn → {ExpectSyncOff, SeekingSyncOn}
+//   ExpectSyncOff → {AwaitSymbolOn, SeekingSyncOn}
+//   AwaitSymbolOn → {ExpectLongOff, ExpectShortOff, SeekingSyncOn}
+//   ExpectLongOff → {AwaitSymbolOn, SeekingSyncOn}
+//   ExpectShortOff → {AwaitSymbolOn, SeekingSyncOn}
+enum class RecvState : uint8_t {
+    SeekingSyncOn,
+    ExpectSyncOff,
+    AwaitSymbolOn,
+    ExpectLongOff,
+    ExpectShortOff,
+};
+
 template <uint8_t PIN_CS, uint8_t PIN_GDO0, uint8_t PIN_GDO2>
 class RadioTransmitter {
     Module radio_module;
@@ -39,6 +54,7 @@ class RadioTransmitter {
 
     static void IRAM_ATTR handle_edge()
     {
+        uint64_t now = micros();
         // TODO
     }
 
