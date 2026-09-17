@@ -10,7 +10,7 @@
 #define CC1101_REG_PKTCTRL0 0x08
 
 #define BUFFER_CAPACITY 2000
-#define MAX_EDGE_COUNT_PER_ROW 10
+#define MAX_EDGE_COUNT_PER_ROW 100
 
 volatile uint64_t edge_times[BUFFER_CAPACITY];
 volatile bool edge_levels[BUFFER_CAPACITY];
@@ -48,13 +48,13 @@ void IRAM_ATTR on_edge()
 
 void setup()
 {
-    Serial.begin(74880);
+    Serial.begin(115200);
     delay(1000);
 
     WiFi.mode(WIFI_OFF);
     WiFi.forceSleepBegin();
 
-    int state = radio.begin(433.92, 4.8, 5.0, 325.0, 10, 16);
+    int state = radio.begin(434, 4.8, 5.0, 300.0, 10, 16);
     if (state != RADIOLIB_ERR_NONE) {
         Serial.print(F("Cannot initialize CC1101 module."));
         Serial.println(state);
@@ -74,9 +74,92 @@ void setup()
     Serial.println(F("Listening for remote signal..."));
 }
 
+enum class EdgeClass : uint8_t {
+    ShortOn,
+    ShortOff,
+    LongOn,
+    LongOff,
+    SyncOn,
+    SyncOff,
+    Unknown,
+};
+
+EdgeClass filter(uint64_t duration, bool carrier_on)
+{
+    constexpr float p = 0.15;
+
+    constexpr uint64_t short_duration = 340;
+    constexpr uint64_t short_lower_bound = short_duration * (1.0 - p);
+    constexpr uint64_t short_upper_bound = short_duration * (1.0 + p);
+
+    constexpr uint64_t long_duration = 730;
+    constexpr uint64_t long_lower_bound = long_duration * (1.0 - p);
+    constexpr uint64_t long_upper_bound = long_duration * (1.0 + p);
+
+    constexpr uint64_t sync_on_duration = 7400;
+    constexpr uint64_t sync_on_lower_bound = sync_on_duration * (1.0 - p);
+    constexpr uint64_t sync_on_upper_bound = sync_on_duration * (1.0 + p);
+
+    constexpr uint64_t sync_off_duration = 1090;
+    constexpr uint64_t sync_off_lower_bound = sync_off_duration * (1.0 - p);
+    constexpr uint64_t sync_off_upper_bound = sync_off_duration * (1.0 + p);
+
+    if (short_lower_bound <= duration && duration <= short_upper_bound) {
+        return carrier_on
+            ? EdgeClass::ShortOn
+            : EdgeClass::ShortOff;
+    }
+
+    if (long_lower_bound <= duration && duration <= long_upper_bound) {
+        return carrier_on
+            ? EdgeClass::LongOn
+            : EdgeClass::LongOff;
+    }
+
+    if (sync_on_lower_bound <= duration && duration <= sync_on_upper_bound) {
+        return carrier_on
+            ? EdgeClass::SyncOn
+            : EdgeClass::Unknown;
+    }
+
+    if (sync_off_lower_bound <= duration && duration <= sync_off_upper_bound) {
+        return carrier_on
+            ? EdgeClass::Unknown
+            : EdgeClass::SyncOff;
+    }
+
+    return EdgeClass::Unknown;
+}
+
+const char* edge_class_symbol(EdgeClass c)
+{
+    switch (c) {
+    case EdgeClass::ShortOn:
+        return "▔";
+
+    case EdgeClass::ShortOff:
+        return "▁";
+
+    case EdgeClass::LongOn:
+        return "▀";
+
+    case EdgeClass::LongOff:
+        return "▄";
+
+    case EdgeClass::SyncOn:
+        return "█";
+
+    case EdgeClass::SyncOff:
+        return "▂";
+
+    default:
+        return "▒";
+    }
+}
+
 void loop()
 {
-    delay(1000);
+    delay(250);
 
     if (edge_count < 10) {
         return;
@@ -94,14 +177,14 @@ void loop()
     interrupts();
 
     for (uint32_t i = 0; i < current_edge_count; ++i) {
+        auto cls = filter(current_edge_times[i], !current_edge_levels[i]);
+
         if (edges_in_row > MAX_EDGE_COUNT_PER_ROW) {
             Serial.println();
             edges_in_row = 0;
         }
 
-        Serial.print(current_edge_levels[i] ? "H[" : "L[");
-        Serial.print(current_edge_times[i]);
-        Serial.print("] ");
+        Serial.print(edge_class_symbol(cls));
 
         ++edges_in_row;
     }
