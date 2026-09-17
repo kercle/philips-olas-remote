@@ -66,6 +66,8 @@ void loop()
         (*task)(controller);
     }
 
+    controller.handle_received_data();
+
     web_server.handle_client();
     MDNS.update();
     yield();

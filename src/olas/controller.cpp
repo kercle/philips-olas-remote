@@ -4,7 +4,7 @@ namespace olas {
 
 Controller::Controller(uint32_t fan_id, uint8_t bursts)
     : frame_builder(fan_id, 0)
-    , transmitter(RadioTransmitter<config::pin_cs, config::pin_gdo0, config::pin_gdo2>::get_instance())
+    , transmitter(config::pin_cs, config::pin_gdo0, config::pin_gdo2)
     , bursts(bursts)
 {
 }
@@ -12,6 +12,10 @@ Controller::Controller(uint32_t fan_id, uint8_t bursts)
 RadioTransmitterResult Controller::initialize()
 {
     return transmitter.initialize(&frame_builder);
+}
+
+void Controller::handle_received_data() {
+    auto frame = transmitter.receive_frame();
 }
 
 void Controller::light_on()

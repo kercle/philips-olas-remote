@@ -7,13 +7,15 @@ namespace olas {
 
 class Controller {
     FrameBuilder frame_builder;
-    RadioTransmitter<config::pin_cs, config::pin_gdo0, config::pin_gdo2> &transmitter;
+    RadioTransmitter transmitter;
 
     uint8_t bursts;
 
 public:
     Controller(uint32_t fan_id, uint8_t bursts = 4);
     RadioTransmitterResult initialize();
+
+    void handle_received_data();
 
     void light_on();
     void light_off();

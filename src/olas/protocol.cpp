@@ -1,6 +1,6 @@
 #include <olas/protocol.h>
 
-constexpr uint8_t check_xor_constant = 0x58;
+constexpr uint8_t check_xor_constant = 0x5B;
 
 namespace olas {
 Frame::Frame(uint64_t data)

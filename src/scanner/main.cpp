@@ -58,8 +58,9 @@ void setup()
     radio.setOOK(true);
     radio.startReceive();
 
-    radio_module.SPIwriteRegister(CC1101_REG_IOCFG0, 0x0D);
-    radio_module.SPIwriteRegister(CC1101_REG_PKTCTRL0, 0x32);
+    // radio_module.SPIwriteRegister(CC1101_REG_IOCFG0, 0x0D);
+    // radio_module.SPIwriteRegister(CC1101_REG_PKTCTRL0, 0x32);
+    radio.receiveDirectAsync();
 
     pinMode(PIN_GDO0, INPUT);
     attachInterrupt(digitalPinToInterrupt(PIN_GDO0), on_edge, CHANGE);
