@@ -2,6 +2,9 @@
 
 namespace olas {
 
+constexpr uint8_t cc1101_reg_iocfg0 = 0x02;
+constexpr uint8_t cc1101_reg_pktctrl0 = 0x08;
+
 RadioTransmitterInitResult::RadioTransmitterInitResult(bool _ok, int16_t _code)
     : _ok(_ok)
     , _code(_code)
@@ -28,11 +31,13 @@ int16_t RadioTransmitterInitResult::code() const
     return _code;
 }
 
-RadioTransmitterImpl::RadioTransmitterImpl(Module& radio_module, CC1101& radio)
+RadioTransmitterImpl::RadioTransmitterImpl(Module& radio_module, CC1101& radio, IsrHandler isr_handler)
     : frame_builder(nullptr)
     , radio_module(radio_module)
     , radio(radio)
+    , isr_handler(isr_handler)
     , initialized(false)
+    , receiving(false)
 {
 }
 
@@ -87,7 +92,8 @@ RadioTransmitterInitResult RadioTransmitterImpl::initialize(FrameBuilder* frame_
     return RadioTransmitterInitResult::ok();
 }
 
-bool RadioTransmitterImpl::is_initialized() const {
+bool RadioTransmitterImpl::is_initialized() const
+{
     return initialized;
 }
 
@@ -172,6 +178,38 @@ bool RadioTransmitterImpl::transmit_bursts(Command cmd, uint8_t repeats)
 
     frame_builder->advance_frame_counter();
     return true;
+}
+
+bool RadioTransmitterImpl::start_receiving()
+{
+    if (!is_initialized() || receiving) {
+        return receiving;
+    }
+
+    radio.setOOK(true);
+    radio.startReceive();
+
+    radio_module.SPIwriteRegister(cc1101_reg_iocfg0, 0x0D);
+    radio_module.SPIwriteRegister(cc1101_reg_pktctrl0, 0x32);
+
+    pinMode(radio_module.getGpio(), INPUT);
+    attachInterrupt(
+        digitalPinToInterrupt(radio_module.getGpio()),
+        isr_handler,
+        CHANGE);
+
+    receiving = true;
+    return true;
+}
+
+void RadioTransmitterImpl::stop_receiving()
+{
+    if (!receiving) {
+        return;
+    }
+
+    detachInterrupt(digitalPinToInterrupt(radio_module.getGpio()));
+    receiving = false;
 }
 
 }

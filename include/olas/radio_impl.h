@@ -8,6 +8,8 @@
 
 namespace olas {
 
+using IsrHandler = void (*)();
+
 class RadioTransmitterInitResult {
     bool _ok;
     int16_t _code;
@@ -22,7 +24,7 @@ public:
     int16_t code() const;
 };
 
-typedef BitSequence<config::waveform_bytes> WaveformBuffer;
+using WaveformBuffer = BitSequence<config::waveform_bytes>;
 
 // This class contains all the moving parts for communicating
 // via CC1101 chips.
@@ -35,8 +37,10 @@ class RadioTransmitterImpl {
 
     Module& radio_module;
     CC1101& radio;
+    IsrHandler isr_handler;
 
     bool initialized;
+    bool receiving;
 
     void encode_bit(WaveformBuffer& waveform, bool bit);
     void encode_sync_signal(WaveformBuffer& waveform);
@@ -44,8 +48,11 @@ class RadioTransmitterImpl {
 
     bool transmit_waveform(WaveformBuffer& waveform);
 
+    bool start_receiving();
+    void stop_receiving();
+
 public:
-    RadioTransmitterImpl(Module& radio_module, CC1101& radio);
+    RadioTransmitterImpl(Module& radio_module, CC1101& radio, IsrHandler isr_handler);
 
     RadioTransmitterInitResult initialize(FrameBuilder* frame_builder);
     bool is_initialized() const;

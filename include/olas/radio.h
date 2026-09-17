@@ -1,7 +1,5 @@
 #pragma once
 
-#include <RadioLib.h>
-
 #include <config.h>
 #include <olas/bit_sequence.h>
 #include <olas/protocol.h>
@@ -43,31 +41,17 @@ class RadioTransmitter {
     CC1101 radio;
     RadioTransmitterImpl impl;
 
-    bool receiving;
-
     inline static volatile uint32_t last_edge_time = 0;
     inline static volatile RecvState current_state = RecvState::SeekingSyncOn;
     inline static volatile uint64_t current_frame = 0;
     inline static volatile uint8_t current_frame_size = 0;
-    inline static volatile RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
-
-    static constexpr uint8_t cc1101_reg_iocfg0 = 0x02;
-    static constexpr uint8_t cc1101_reg_pktctrl0 = 0x08;
+    inline static RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
 
     RadioTransmitter()
         : radio_module(PIN_CS, PIN_GDO0, RADIOLIB_NC, PIN_GDO2)
         , radio(&radio_module)
-        , impl(radio_module, radio)
-        , receiving(false)
+        , impl(radio_module, radio, RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::handle_edge)
     {
-    }
-
-    void write_raw_register(uint8_t addr, uint8_t value)
-    {
-        digitalWrite(PIN_CS, LOW);
-        SPI.transfer(addr);
-        SPI.transfer(value);
-        digitalWrite(PIN_CS, HIGH);
     }
 
     static void IRAM_ATTR reset_state_machine()
@@ -203,40 +187,6 @@ public:
     bool transmit_bursts(Command cmd, uint8_t repeats)
     {
         return impl.transmit_bursts(cmd, repeats);
-    }
-
-    bool start_receiving()
-    {
-        if (!impl.is_initialized() || receiving) {
-            return receiving;
-        }
-
-        radio.setOOK(true);
-        radio.startReceive();
-
-        write_raw_register(cc1101_reg_iocfg0, 0x0D);
-        write_raw_register(cc1101_reg_pktctrl0, 0x32);
-
-        last_edge_time = micros();
-
-        pinMode(PIN_GDO0, INPUT);
-        attachInterrupt(
-            digitalPinToInterrupt(PIN_GDO0),
-            RadioTransmitter<PIN_CS, PIN_GDO0, PIN_GDO2>::handle_edge,
-            CHANGE);
-
-        receiving = true;
-        return true;
-    }
-
-    void stop_receiving()
-    {
-        if (!receiving) {
-            return;
-        }
-
-        detachInterrupt(digitalPinToInterrupt(PIN_GDO0));
-        receiving = false;
     }
 };
 

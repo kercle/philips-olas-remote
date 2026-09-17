@@ -1,6 +1,5 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <RadioLib.h>
 
 #include <config.h>
 #include <secrets.h>
