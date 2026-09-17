@@ -66,15 +66,29 @@ bool Frame::get_frame_bit(int8_t msb_first_pos) const
     return (data >> (40 - msb_first_pos)) & 1;
 }
 
+uint32_t Frame::get_fan_id() const
+{
+    return static_cast<uint32_t>((data >> 17) & 0xffffff);
+}
+
 Command Frame::get_command() const
 {
     return static_cast<Command>((data >> 9) & 0xfc);
+}
+
+uint8_t Frame::get_counter() const
+{
+    return static_cast<uint8_t>((data >> 9) & 0x3);
 }
 
 FrameBuilder::FrameBuilder(uint32_t fan_id, uint8_t init_frame_counter)
     : fan_id(fan_id & 0xffffff) // we can only have 24 bits for the fan ID
     , frame_counter(init_frame_counter)
 {
+}
+
+uint32_t FrameBuilder::get_fan_id() const {
+    return fan_id;
 }
 
 Frame FrameBuilder::build(Command cmd) const
@@ -93,6 +107,10 @@ void FrameBuilder::advance_frame_counter()
 {
     // decrement unsigned frame counter
     frame_counter = (frame_counter + 3) & 0x03;
+}
+
+void FrameBuilder::set_frame_counter(uint8_t value) {
+    frame_counter = value;
 }
 
 }

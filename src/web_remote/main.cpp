@@ -59,6 +59,8 @@ void setup()
 
 void loop()
 {
+    static auto fan_state = controller.get_state();
+
     FanControllerWebServer& web_server = FanControllerWebServer::get_instance();
 
     auto task = web_server.take_task();
@@ -67,6 +69,16 @@ void loop()
     }
 
     controller.handle_received_data();
+
+    if (fan_state != controller.get_state()) {
+        fan_state = controller.get_state();
+        Serial.print("Light: ");
+        Serial.println(fan_state.light);
+        Serial.print("Fan: ");
+        Serial.println(fan_state.fan);
+        Serial.print("Reversed: ");
+        Serial.println(fan_state.reversed);
+    }
 
     web_server.handle_client();
     MDNS.update();

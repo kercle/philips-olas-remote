@@ -44,7 +44,9 @@ public:
         return 41;
     }
 
+    uint32_t get_fan_id() const;
     Command get_command() const;
+    uint8_t get_counter() const;
 };
 
 class FrameBuilder {
@@ -54,8 +56,11 @@ class FrameBuilder {
 public:
     FrameBuilder(uint32_t fan_id, uint8_t init_frame_counter);
 
+    uint32_t get_fan_id() const;
+
     Frame build(Command cmd) const;
     void advance_frame_counter();
+    void set_frame_counter(uint8_t value);
 };
 
 }

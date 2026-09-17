@@ -268,17 +268,11 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
 }
 
 std::optional<Frame> RadioTransmitter::receive_frame() {
-    // Serial.print("Last edge time: ");
-    // Serial.print(rx_state.last_edge_time);
-
     auto frame_raw = rx_state.frame_data_queue.pop();
 
     if (!frame_raw.has_value()) {
         return std::nullopt;
     }
-
-    Serial.print("Received frame candidate: ");
-    Serial.println(frame_raw.value(), HEX);
 
     return Frame::from_data(frame_raw.value());
 }

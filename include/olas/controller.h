@@ -5,9 +5,21 @@
 
 namespace olas {
 
+struct FanState {
+    bool light;
+    uint8_t fan;
+    bool reversed;
+
+    FanState();
+
+    bool operator ==(const FanState& other);
+    bool operator !=(const FanState& other);
+};
+
 class Controller {
     FrameBuilder frame_builder;
     RadioTransmitter transmitter;
+    FanState state;
 
     uint8_t bursts;
 
@@ -16,6 +28,7 @@ public:
     RadioTransmitterResult initialize();
 
     void handle_received_data();
+    FanState get_state() const;
 
     void light_on();
     void light_off();
