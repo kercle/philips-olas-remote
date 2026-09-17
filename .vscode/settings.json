@@ -3,6 +3,7 @@
         "IRAM",
         "kbps",
         "olas",
-        "RADIOLIB"
+        "RADIOLIB",
+        "Spsc"
     ]
 }
