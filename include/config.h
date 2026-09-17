@@ -7,7 +7,7 @@ constexpr unsigned char pin_cs = 15;
 constexpr unsigned char pin_gdo0 = 4;
 constexpr unsigned char pin_gdo2 = 5;
 
-constexpr float rf_frequency_mhz = 433.920f;
+constexpr float rf_frequency_mhz = 434.0f;
 constexpr float raw_bitrate_kbps = 9.323f;
 
 constexpr unsigned sync_on_bits = 69;
