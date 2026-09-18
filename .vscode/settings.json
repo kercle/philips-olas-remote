@@ -4,6 +4,9 @@
         "kbps",
         "olas",
         "RADIOLIB",
-        "Spsc"
+        "Spsc",
+        "Subsetter",
+        "unicodes",
+        "webfonts"
     ]
 }

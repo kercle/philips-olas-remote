@@ -15,3 +15,6 @@ pyftsubset fa-regular-400.woff2 \
   --layout-features="*" \
   --output-file=fa-regular-custom.woff2
 ```
+
+> [!WARNING]  
+> Sub-setting also happens as part of the pre-scripts when compiling PlatformIO targets. For adding a glyph, modify the script `scripts/subset_webfonts.py`.
