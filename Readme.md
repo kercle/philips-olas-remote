@@ -1,8 +1,10 @@
-# PHILIPS Olas ceiling fan
+# Controller for Philips Olas Ceiling Fan
 
 ![Philips Olas ceiling fan](./assets/philips-olas-fan.png)
 
 This little project aims at implementing the protocol of the [PHILIPS Olas ceiling fan](https://www.lighting.philips.at/consumer/p/deckenventilator-mit-beleuchtung-olas-deckenventilatorleuchte-32-w-ventilator-24-w-leuchte/8720169369993) for the purpose of home automation. The software was implemented for an ESP8266 micro-controller (NodeMCU) connected to a CC1101 module, but it can easily be adopted to other platforms.
+
+> ⚖️ **Disclaimer:** This project is not affiliated, associated, authorized, or endorsed by Koninklijke Philips N.V. or any of its subsidiaries.
 
 ## Hardware
 
@@ -18,7 +20,7 @@ The protocol was recorded using the firmware compiled from the `scanner` build-t
 
 | Parameter        | Value            |
 | :--------------- | :--------------- |
-| Frequency        | 433.92 MHz       |
+| Frequency        | 434 MHz          |
 | Modulation       | OOK (ASK)        |
 | Carrier ON       | logical 1 in raw RF bitstream |
 | Carrier OFF      | logical 0 in raw RF bitstream |
