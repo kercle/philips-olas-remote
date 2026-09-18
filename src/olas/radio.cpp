@@ -349,6 +349,13 @@ void IRAM_ATTR RadioRxState::update_state(RadioRxState* self, EdgeClass cls)
     }
 }
 
+bool IRAM_ATTR is_in_timing_window(uint32_t window_center, uint32_t value) {
+    const uint32_t lower_bound = window_center - config::timing_window_width / 2;
+    const uint32_t upper_bound = window_center + config::timing_window_width / 2;
+
+    return lower_bound <= value && value <= upper_bound;
+}
+
 void IRAM_ATTR RadioRxState::handle_edge(void* self_raw)
 {
     auto self = static_cast<RadioRxState*>(self_raw);
@@ -360,32 +367,20 @@ void IRAM_ATTR RadioRxState::handle_edge(void* self_raw)
     auto gpio_level_after_edge = digitalRead(self->pin_gdo0);
     auto carrier_on = !gpio_level_after_edge;
 
-    constexpr uint32_t short_lower_bound = config::median_short_pulse_duration - config::timing_window_width / 2;
-    constexpr uint32_t short_upper_bound = config::median_short_pulse_duration + config::timing_window_width / 2;
-
-    constexpr uint32_t long_lower_bound = config::median_long_pulse_duration - config::timing_window_width / 2;
-    constexpr uint32_t long_upper_bound = config::median_long_pulse_duration + config::timing_window_width / 2;
-
-    constexpr uint32_t sync_on_lower_bound = config::median_sync_on_duration - config::timing_window_width / 2;
-    constexpr uint32_t sync_on_upper_bound = config::median_sync_on_duration + config::timing_window_width / 2;
-
-    constexpr uint32_t sync_off_lower_bound = config::median_sync_off_duration - config::timing_window_width / 2;
-    constexpr uint32_t sync_off_upper_bound = config::median_sync_off_duration + config::timing_window_width / 2;
-
     EdgeClass cls = EdgeClass::Unknown;
-    if (short_lower_bound <= duration && duration <= short_upper_bound) {
+    if (is_in_timing_window(config::median_short_pulse_duration, duration)) {
         cls = carrier_on
             ? EdgeClass::ShortOn
             : EdgeClass::ShortOff;
-    } else if (long_lower_bound <= duration && duration <= long_upper_bound) {
+    } else if (is_in_timing_window(config::median_long_pulse_duration, duration)) {
         cls = carrier_on
             ? EdgeClass::LongOn
             : EdgeClass::LongOff;
-    } else if (sync_on_lower_bound <= duration && duration <= sync_on_upper_bound) {
+    } else if (is_in_timing_window(config::median_sync_on_duration, duration)) {
         cls = carrier_on
             ? EdgeClass::SyncOn
             : EdgeClass::Unknown;
-    } else if (sync_off_lower_bound <= duration && duration <= sync_off_upper_bound) {
+    } else if (is_in_timing_window(config::median_sync_off_duration, duration)) {
         cls = carrier_on
             ? EdgeClass::Unknown
             : EdgeClass::SyncOff;
