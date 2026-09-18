@@ -120,7 +120,7 @@ RadioTransmitterResult RadioTransmitter::stop_receiving()
         return RadioTransmitterResult::ok();
     }
 
-    detachInterrupt(digitalPinToInterrupt(radio_module.getGpio()));
+    detachInterrupt(digitalPinToInterrupt(radio_module.getIrq()));
 
     int16_t state = radio.finishReceive();
     if (state != RADIOLIB_ERR_NONE) {
