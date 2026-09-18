@@ -1,5 +1,8 @@
 #pragma once
 
+#define ENABLE_WEBSERVER
+#define ENABLE_MQTT_CLIENT
+
 namespace config {
 
 //# Radio configuration
@@ -29,7 +32,7 @@ constexpr unsigned median_sync_on_duration = 7400; // µs
 constexpr unsigned median_sync_off_duration = 1090; // µs
 
 
-// Web server configuration
+//# Web server configuration
 static const char hostname[] = "philips-olas-remote";
 constexpr unsigned task_execution_time_gap = 50; // milliseconds
 
