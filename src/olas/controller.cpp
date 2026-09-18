@@ -83,6 +83,8 @@ void Controller::handle_received_data()
     case Command::LightOn:
         state.light = true;
         break;
+    default:
+        break;
     }
 }
 
