@@ -1,6 +1,5 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <RadioLib.h>
 
 #include <config.h>
 #include <secrets.h>
@@ -60,11 +59,25 @@ void setup()
 
 void loop()
 {
+    static auto fan_state = controller.get_state();
+
     FanControllerWebServer& web_server = FanControllerWebServer::get_instance();
 
     auto task = web_server.take_task();
     if (task.has_value()) {
         (*task)(controller);
+    }
+
+    controller.handle_received_data();
+
+    if (fan_state != controller.get_state()) {
+        fan_state = controller.get_state();
+        Serial.print("Light: ");
+        Serial.println(fan_state.light);
+        Serial.print("Fan: ");
+        Serial.println(fan_state.fan);
+        Serial.print("Reversed: ");
+        Serial.println(fan_state.reversed);
     }
 
     web_server.handle_client();

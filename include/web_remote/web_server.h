@@ -7,7 +7,7 @@
 
 #include <olas/controller.h>
 
-typedef std::function<void(olas::Controller&)> CmdFn;
+using CmdFn = std::function<void(olas::Controller&)>;
 
 class FanControllerWebServer {
     std::optional<CmdFn> task;

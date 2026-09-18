@@ -3,98 +3,105 @@
 #include <RadioLib.h>
 
 #include <config.h>
+#include <olas/bit_sequence.h>
 #include <olas/protocol.h>
+#include <olas/ring_buffer.h>
 
 namespace olas {
 
-template <unsigned N_BYTES>
-class BitSequence {
-    unsigned bit_idx;
-    uint8_t data[N_BYTES];
-
-public:
-    BitSequence()
-        : bit_idx(0)
-    {
-        memset(data, 0, N_BYTES);
-    }
-
-    bool push(bool bit)
-    {
-        if (bit_idx >= N_BYTES * 8) {
-            // no space left
-            return false;
-        }
-
-        unsigned byte_idx = bit_idx >> 3;
-        unsigned rel_bit_idx = 7 - (bit_idx & 7);
-
-        if (bit) {
-            data[byte_idx] |= 1 << rel_bit_idx;
-        }
-
-        ++bit_idx;
-
-        return true;
-    }
-
-    bool push_repeated(bool bit, unsigned count)
-    {
-        for (unsigned i = 0; i < count; ++i) {
-            if (!push(bit)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    const uint8_t* get_raw() const
-    {
-        return data;
-    }
-
-    constexpr static unsigned capacity_bytes() {
-        return N_BYTES;
-    }
-};
-
-class RadioTransmitterInitResult {
+class RadioTransmitterResult {
     bool _ok;
     int16_t _code;
 
-    RadioTransmitterInitResult(bool _ok, int16_t _code);
+    RadioTransmitterResult(bool _ok, int16_t _code);
 
 public:
-    static RadioTransmitterInitResult ok();
-    static RadioTransmitterInitResult err(int16_t code);
+    static RadioTransmitterResult ok();
+    static RadioTransmitterResult err(int16_t code);
 
     bool is_err() const;
+    bool is_ok() const;
+
     int16_t code() const;
 };
 
-typedef BitSequence<config::waveform_bytes> WaveformBuffer;
+using WaveformBuffer = BitSequence<config::waveform_bytes>;
+
+constexpr size_t ring_buffer_size = 64;
+
+// State machine for receiving signals:
+// Transitions:
+//   SeekingSyncOn → {ExpectSyncOff, SeekingSyncOn}
+//   ExpectSyncOff → {AwaitSymbolOn, SeekingSyncOn}
+//   AwaitSymbolOn → {ExpectLongOff, ExpectShortOff, SeekingSyncOn}
+//   ExpectLongOff → {AwaitSymbolOn, SeekingSyncOn}
+//   ExpectShortOff → {AwaitSymbolOn, SeekingSyncOn}
+enum class RecvState : uint8_t {
+    SeekingSyncOn,
+    ExpectSyncOff,
+    AwaitSymbolOn,
+    ExpectLongOff,
+    ExpectShortOff,
+};
+
+enum class EdgeClass : uint8_t {
+    ShortOn,
+    ShortOff,
+    LongOn,
+    LongOff,
+    SyncOn,
+    SyncOff,
+    Unknown,
+};
+
+struct RadioRxState {
+    uint8_t pin_gdo0;
+
+    volatile uint32_t last_edge_time = 0;
+    volatile RecvState current_state = RecvState::SeekingSyncOn;
+    volatile uint64_t current_frame = 0;
+    volatile uint8_t current_frame_size = 0;
+    RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
+
+    static void IRAM_ATTR reset_state_machine(RadioRxState* self);
+    static void IRAM_ATTR update_state(RadioRxState* self, EdgeClass cls);
+    static void IRAM_ATTR handle_edge(void* self_raw);
+
+    RadioRxState(uint8_t pin_gdo0);
+};
 
 class RadioTransmitter {
-    FrameBuilder& frame_builder;
-
+    FrameBuilder* frame_builder;
     Module radio_module;
     CC1101 radio;
 
+    RadioRxState rx_state;
+
     bool initialized;
+    bool receiving;
+
+    RadioTransmitterResult configure_tx_mode();
 
     void encode_bit(WaveformBuffer& waveform, bool bit);
     void encode_sync_signal(WaveformBuffer& waveform);
     void build_waveform(WaveformBuffer& waveform, Command cmd);
 
+    bool configure_transmit_mode();
     bool transmit_waveform(WaveformBuffer& waveform);
 
+    RadioTransmitterResult start_receiving();
+    RadioTransmitterResult stop_receiving();
+
 public:
-    RadioTransmitter(FrameBuilder& frame_builder);
-    RadioTransmitterInitResult initialize();
+    RadioTransmitter(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2);
+
+    RadioTransmitterResult initialize(FrameBuilder* frame_builder);
+    bool is_initialized() const;
 
     bool transmit(Command cmd);
     bool transmit_bursts(Command cmd, uint8_t repeats);
+
+    std::optional<Frame> receive_frame();
 };
 
 }
