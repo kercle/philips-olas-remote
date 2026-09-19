@@ -1,6 +1,6 @@
-#include <olas/radio.h>
+#include <olas_cc1101/radio.h>
 
-namespace olas {
+namespace olas_cc1101 {
 
 RadioTransmitterResult::RadioTransmitterResult(bool _ok, int16_t _code)
     : _ok(_ok)
@@ -33,9 +33,8 @@ int16_t RadioTransmitterResult::code() const
     return _code;
 }
 
-RadioTransmitter::RadioTransmitter(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2)
-    : frame_builder(nullptr)
-    , radio_module(pin_cs, pin_gdo0, RADIOLIB_NC, pin_gdo2)
+RadioTransmitterCC1101::RadioTransmitterCC1101(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2)
+    : radio_module(pin_cs, pin_gdo0, RADIOLIB_NC, pin_gdo2)
     , radio(&radio_module)
     , rx_state(pin_gdo0)
     , initialized(false)
@@ -43,13 +42,11 @@ RadioTransmitter::RadioTransmitter(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin
 {
 }
 
-RadioTransmitterResult RadioTransmitter::initialize(FrameBuilder* frame_builder)
+RadioTransmitterResult RadioTransmitterCC1101::initialize()
 {
     if (initialized) {
         return RadioTransmitterResult::ok();
     }
-
-    this->frame_builder = frame_builder;
 
     int16_t state = 0;
 
@@ -88,7 +85,7 @@ RadioTransmitterResult RadioTransmitter::initialize(FrameBuilder* frame_builder)
     return RadioTransmitterResult::ok();
 }
 
-RadioTransmitterResult RadioTransmitter::start_receiving()
+RadioTransmitterResult RadioTransmitterCC1101::start_receiving()
 {
     // We don't have to check if we are initialized here,
     // since start_receiving is called by initialize
@@ -114,7 +111,7 @@ RadioTransmitterResult RadioTransmitter::start_receiving()
     return RadioTransmitterResult::ok();
 }
 
-RadioTransmitterResult RadioTransmitter::stop_receiving()
+RadioTransmitterResult RadioTransmitterCC1101::stop_receiving()
 {
     if (!receiving) {
         return RadioTransmitterResult::ok();
@@ -131,12 +128,12 @@ RadioTransmitterResult RadioTransmitter::stop_receiving()
     return RadioTransmitterResult::ok();
 }
 
-bool RadioTransmitter::is_initialized() const
+bool RadioTransmitterCC1101::is_initialized() const
 {
     return initialized;
 }
 
-void RadioTransmitter::encode_bit(WaveformBuffer& waveform, bool bit)
+void RadioTransmitterCC1101::encode_bit(WaveformBuffer& waveform, bool bit)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -151,7 +148,7 @@ void RadioTransmitter::encode_bit(WaveformBuffer& waveform, bool bit)
     }
 }
 
-void RadioTransmitter::encode_sync_signal(WaveformBuffer& waveform)
+void RadioTransmitterCC1101::encode_sync_signal(WaveformBuffer& waveform)
 {
     // TODO: don't fail silently when waveform overfills
     // in particular if this code is reused for other
@@ -161,17 +158,16 @@ void RadioTransmitter::encode_sync_signal(WaveformBuffer& waveform)
     waveform.push_repeated(false, config::sync_off_bits);
 }
 
-void RadioTransmitter::build_waveform(WaveformBuffer& waveform, Command cmd)
+void RadioTransmitterCC1101::build_waveform(WaveformBuffer& waveform, olas::Frame frame)
 {
     encode_sync_signal(waveform);
-    auto frame = frame_builder->build(cmd);
 
     for (uint8_t i = 0; i < frame.bit_size(); ++i) {
         encode_bit(waveform, frame.get_frame_bit(i));
     }
 }
 
-bool RadioTransmitter::configure_transmit_mode()
+bool RadioTransmitterCC1101::configure_transmit_mode()
 {
     int16_t state = radio.packetMode();
     if (state != RADIOLIB_ERR_NONE) {
@@ -193,7 +189,7 @@ bool RadioTransmitter::configure_transmit_mode()
     return state == RADIOLIB_ERR_NONE;
 }
 
-bool RadioTransmitter::transmit_waveform(WaveformBuffer& waveform)
+bool RadioTransmitterCC1101::transmit_waveform(WaveformBuffer& waveform)
 {
     int16_t state = radio.startTransmit(
         waveform.get_raw(),
@@ -222,19 +218,19 @@ bool RadioTransmitter::transmit_waveform(WaveformBuffer& waveform)
     return true;
 }
 
-bool RadioTransmitter::transmit(Command cmd)
+bool RadioTransmitterCC1101::transmit(olas::Frame frm)
 {
-    return transmit_bursts(cmd, 1);
+    return transmit_bursts(frm, 1);
 }
 
-bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
+bool RadioTransmitterCC1101::transmit_bursts(olas::Frame frm, uint8_t repeats)
 {
     if (!is_initialized() || !repeats) {
         return false;
     }
 
     WaveformBuffer waveform;
-    build_waveform(waveform, cmd);
+    build_waveform(waveform, frm);
 
     if (stop_receiving().is_err()) {
         // If stop receiving didn't work
@@ -263,18 +259,18 @@ bool RadioTransmitter::transmit_bursts(Command cmd, uint8_t repeats)
         return false;
     }
 
-    frame_builder->advance_frame_counter();
     return true;
 }
 
-std::optional<Frame> RadioTransmitter::receive_frame() {
+std::optional<olas::Frame> RadioTransmitterCC1101::receive_frame()
+{
     auto frame_raw = rx_state.frame_data_queue.pop();
 
     if (!frame_raw.has_value()) {
         return std::nullopt;
     }
 
-    return Frame::from_data(frame_raw.value());
+    return olas::Frame::from_data(frame_raw.value());
 }
 
 RadioRxState::RadioRxState(uint8_t pin_gdo0)
@@ -349,7 +345,8 @@ void IRAM_ATTR RadioRxState::update_state(RadioRxState* self, EdgeClass cls)
     }
 }
 
-bool IRAM_ATTR is_in_timing_window(uint32_t window_center, uint32_t value) {
+bool IRAM_ATTR is_in_timing_window(uint32_t window_center, uint32_t value)
+{
     const uint32_t lower_bound = window_center - config::timing_window_width / 2;
     const uint32_t upper_bound = window_center + config::timing_window_width / 2;
 

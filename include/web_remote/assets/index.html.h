@@ -23,7 +23,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/regular.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
-    <script src="index.js" lang="javascript"></script>
+    <script src="js/index.js" lang="javascript"></script>
 </head>
 
 <body>

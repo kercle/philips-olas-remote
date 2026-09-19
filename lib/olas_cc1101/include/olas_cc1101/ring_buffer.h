@@ -6,9 +6,11 @@
 #include <optional>
 #include <type_traits>
 
-namespace detail {
+namespace ring_buffer_impl {
 
 #ifdef ESP8266
+
+#include <Arduino.h>
 
 class SpscIndex {
 public:
@@ -22,7 +24,7 @@ public:
         const uint32_t result = value;
 
         // Do not move subsequent memory accesses before this load.
-        std::atomic_signal_fence(std::memory_order_acquire);
+        ::std::atomic_signal_fence(::std::memory_order_acquire);
 
         return result;
     }
@@ -30,7 +32,7 @@ public:
     void IRAM_ATTR store_release(uint32_t new_value)
     {
         // Do not move preceding memory accesses after publication.
-        std::atomic_signal_fence(std::memory_order_release);
+        ::std::atomic_signal_fence(::std::memory_order_release);
 
         value = new_value;
     }
@@ -114,6 +116,6 @@ public:
 private:
     std::array<T, N> data { };
 
-    detail::SpscIndex write_index;
-    detail::SpscIndex read_index;
+    ring_buffer_impl::SpscIndex write_index;
+    ring_buffer_impl::SpscIndex read_index;
 };

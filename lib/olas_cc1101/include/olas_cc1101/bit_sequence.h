@@ -1,7 +1,5 @@
 #pragma once
 
-namespace olas {
-
 template <unsigned N_BYTES>
 class BitSequence {
     unsigned bit_idx;
@@ -53,5 +51,3 @@ public:
         return N_BYTES;
     }
 };
-
-}

@@ -5,11 +5,13 @@
 #include <secrets.h>
 
 #include <olas/controller.h>
+#include <olas_cc1101/radio.h>
 
 #include <web_remote/assets/index.html.h>
 #include <web_remote/web_server.h>
 
-olas::Controller controller(secrets::fan_id);
+olas_cc1101::RadioTransmitterCC1101 radio(config::pin_cs, config::pin_gdo0, config::pin_gdo2);
+olas::Controller controller(radio, secrets::fan_id);
 
 void setup_wifi()
 {
@@ -48,7 +50,7 @@ void setup()
     setup_wifi();
     setup_webserver();
 
-    auto res = controller.initialize();
+    auto res = radio.initialize();
     if (res.is_err()) {
         Serial.print(F("Radio transmitter initialization failed: "));
         Serial.println(res.code());

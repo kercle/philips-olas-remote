@@ -3,11 +3,14 @@
 #include <RadioLib.h>
 
 #include <config.h>
-#include <olas/bit_sequence.h>
-#include <olas/protocol.h>
-#include <olas/ring_buffer.h>
 
-namespace olas {
+#include <olas/radio.h>
+
+#include <olas_cc1101/bit_sequence.h>
+#include <olas_cc1101/ring_buffer.h>
+#include <olas_cc1101/config.h>
+
+namespace olas_cc1101 {
 
 class RadioTransmitterResult {
     bool _ok;
@@ -70,8 +73,7 @@ struct RadioRxState {
     RadioRxState(uint8_t pin_gdo0);
 };
 
-class RadioTransmitter {
-    FrameBuilder* frame_builder;
+class RadioTransmitterCC1101 : public olas::RadioTransmitter {
     Module radio_module;
     CC1101 radio;
 
@@ -84,7 +86,7 @@ class RadioTransmitter {
 
     void encode_bit(WaveformBuffer& waveform, bool bit);
     void encode_sync_signal(WaveformBuffer& waveform);
-    void build_waveform(WaveformBuffer& waveform, Command cmd);
+    void build_waveform(WaveformBuffer& waveform, olas::Frame frame);
 
     bool configure_transmit_mode();
     bool transmit_waveform(WaveformBuffer& waveform);
@@ -93,15 +95,15 @@ class RadioTransmitter {
     RadioTransmitterResult stop_receiving();
 
 public:
-    RadioTransmitter(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2);
+    RadioTransmitterCC1101(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2);
 
-    RadioTransmitterResult initialize(FrameBuilder* frame_builder);
+    RadioTransmitterResult initialize();
     bool is_initialized() const;
 
-    bool transmit(Command cmd);
-    bool transmit_bursts(Command cmd, uint8_t repeats);
+    virtual bool transmit(olas::Frame frm);
+    virtual bool transmit_bursts(olas::Frame frm, uint8_t repeats);
 
-    std::optional<Frame> receive_frame();
+    virtual std::optional<olas::Frame> receive_frame();
 };
 
 }
