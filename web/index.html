@@ -8,6 +8,7 @@
 
     <title>Ceiling Fan</title>
 
+    <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/regular.min.css">
@@ -30,7 +31,7 @@
             <button onclick="sendCommand('/api/light/dim')">
                 <i class="fa-regular button-icon">&#xf185;</i>Dimmer
             </button>
-            <button  onclick="sendCommand('/api/light/brighten')">
+            <button onclick="sendCommand('/api/light/brighten')">
                 <i class="fa-solid button-icon">&#xf185;</i>Brighter
             </button>
         </div>
@@ -90,6 +91,16 @@
         </div>
         <div id="status"></div>
     </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/js/service_worker.js')
+                    .then((reg) => console.log('Service Worker registered!', reg))
+                    .catch((err) => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 
 </html>
