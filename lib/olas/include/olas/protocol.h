@@ -39,7 +39,7 @@ public:
 
     static std::optional<Frame> from_data(uint64_t data);
 
-    constexpr uint8_t bit_size()
+    constexpr uint8_t bit_size() const
     {
         return 41;
     }
