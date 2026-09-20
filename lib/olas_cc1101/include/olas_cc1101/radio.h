@@ -7,8 +7,8 @@
 #include <olas/radio.h>
 
 #include <olas_cc1101/bit_sequence.h>
-#include <olas_cc1101/ring_buffer.h>
 #include <olas_cc1101/config.h>
+#include <olas_cc1101/ring_buffer.h>
 
 namespace olas_cc1101 {
 
@@ -28,7 +28,7 @@ public:
     int16_t code() const;
 };
 
-using WaveformBuffer = BitSequence<config::waveform_bytes>;
+using WaveformBuffer = containers::BitSequence<config::waveform_bytes>;
 
 constexpr size_t ring_buffer_size = 64;
 
@@ -64,7 +64,7 @@ struct RadioRxState {
     volatile RecvState current_state = RecvState::SeekingSyncOn;
     volatile uint64_t current_frame = 0;
     volatile uint8_t current_frame_size = 0;
-    RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
+    containers::RingBuffer<uint64_t, ring_buffer_size> frame_data_queue;
 
     static void IRAM_ATTR reset_state_machine(RadioRxState* self);
     static void IRAM_ATTR update_state(RadioRxState* self, EdgeClass cls);
