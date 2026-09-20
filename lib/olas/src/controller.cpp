@@ -74,23 +74,23 @@ Controller::Controller(RadioTransmitter& transmitter, uint32_t fan_id, uint8_t b
 void Controller::handle_received_data()
 {
     auto frame = transmitter.receive_frame();
-    if (!frame.has_value()) {
-        return;
+    while (frame.has_value()) {
+        auto val = frame.value();
+
+        if (val.get_fan_id() != frame_builder.get_fan_id()) {
+            // Not our device.
+            // In the future, we can record these
+            // IDs for runtime pairing.
+            return;
+        }
+
+        // We synchronize our counter to the one of external
+        // devices.
+        frame_builder.set_frame_counter(val.get_counter() + 1);
+        state.update_from_command(val.get_command());
+
+        frame = transmitter.receive_frame();
     }
-
-    auto val = frame.value();
-
-    if (val.get_fan_id() != frame_builder.get_fan_id()) {
-        // Not our device.
-        // In the future, we can record these
-        // IDs for runtime pairing.
-        return;
-    }
-
-    // We synchronize our counter to the one of external
-    // devices.
-    frame_builder.set_frame_counter(val.get_counter() + 1);
-    state.update_from_command(val.get_command());
 }
 
 FanState Controller::get_state() const
