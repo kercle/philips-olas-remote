@@ -13,14 +13,14 @@
 namespace olas_cc1101 {
 
 class RadioTransmitterResult {
-    bool _ok;
-    int16_t _code;
+    bool success;
+    int16_t error_code;
 
-    RadioTransmitterResult(bool _ok, int16_t _code);
+    RadioTransmitterResult(bool success, int16_t error_code);
 
 public:
     static RadioTransmitterResult ok();
-    static RadioTransmitterResult err(int16_t code);
+    static RadioTransmitterResult err(int16_t error_code);
 
     bool is_err() const;
     bool is_ok() const;

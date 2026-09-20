@@ -3,8 +3,8 @@
 namespace olas_cc1101 {
 
 RadioTransmitterResult::RadioTransmitterResult(bool _ok, int16_t _code)
-    : _ok(_ok)
-    , _code(_code)
+    : success(_ok)
+    , error_code(_code)
 {
 }
 
@@ -20,17 +20,17 @@ RadioTransmitterResult RadioTransmitterResult::err(int16_t code)
 
 bool RadioTransmitterResult::is_err() const
 {
-    return !_ok;
+    return !success;
 }
 
 bool RadioTransmitterResult::is_ok() const
 {
-    return _ok;
+    return success;
 }
 
 int16_t RadioTransmitterResult::code() const
 {
-    return _code;
+    return error_code;
 }
 
 RadioTransmitterCC1101::RadioTransmitterCC1101(uint8_t pin_cs, uint8_t pin_gdo0, uint8_t pin_gdo2)
