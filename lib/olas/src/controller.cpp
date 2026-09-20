@@ -57,30 +57,21 @@ void FanState::update_from_command(Command cmd)
     }
 }
 
-Command fan_command_from_speed(uint8_t speed)
+void Controller::invoke_cmd(Command cmd)
 {
-    switch (speed) {
-    case 0:
-        return Command::FanOff;
-    case 1:
-        return Command::FanSpeed1;
-    case 2:
-        return Command::FanSpeed2;
-    case 3:
-        return Command::FanSpeed3;
-    case 4:
-        return Command::FanSpeed4;
-    case 5:
-        return Command::FanSpeed5;
-    default:
-        // Maximum speed is 6, so anything above
-        // this values is interpreted as this
-        // maximal speed.
-        return Command::FanSpeed6;
-    }
+    auto frm = frame_builder.build(cmd);
+    transmitter.transmit_bursts(frm, bursts);
+    frame_builder.advance_frame_counter();
 }
 
-void handle_received_data_impl(RadioTransmitter& transmitter, FrameBuilder& frame_builder, FanState& state)
+Controller::Controller(RadioTransmitter& transmitter, uint32_t fan_id, uint8_t bursts)
+    : frame_builder(fan_id, 0)
+    , transmitter(transmitter)
+    , bursts(bursts)
+{
+}
+
+void Controller::handle_received_data()
 {
     auto frame = transmitter.receive_frame();
     if (!frame.has_value()) {
@@ -100,6 +91,73 @@ void handle_received_data_impl(RadioTransmitter& transmitter, FrameBuilder& fram
     // devices.
     frame_builder.set_frame_counter(val.get_counter() + 1);
     state.update_from_command(val.get_command());
+}
+
+FanState Controller::get_state() const
+{
+    return state;
+}
+
+void Controller::light_on()
+{
+    invoke_cmd(Command::LightOn);
+}
+
+void Controller::light_off()
+{
+    invoke_cmd(Command::LightOff);
+}
+
+void Controller::fan_on(uint8_t speed)
+{
+    switch (speed) {
+    case 0:
+        invoke_cmd(Command::FanOff);
+    case 1:
+        invoke_cmd(Command::FanSpeed1);
+    case 2:
+        invoke_cmd(Command::FanSpeed2);
+    case 3:
+        invoke_cmd(Command::FanSpeed3);
+    case 4:
+        invoke_cmd(Command::FanSpeed4);
+    case 5:
+        invoke_cmd(Command::FanSpeed5);
+    default:
+        // Maximum speed is 6, so anything above
+        // this values is interpreted as this
+        // maximal speed.
+        invoke_cmd(Command::FanSpeed6);
+    }
+}
+
+void Controller::fan_off()
+{
+    invoke_cmd(Command::FanOff);
+}
+
+void Controller::increase_brightness(uint8_t steps)
+{
+    for (uint8_t i = 0; i < steps; ++i) {
+        invoke_cmd(Command::LightBrightnessUp);
+    }
+}
+
+void Controller::decrease_brightness(uint8_t steps)
+{
+    for (uint8_t i = 0; i < steps; ++i) {
+        invoke_cmd(Command::LightBrightnessDown);
+    }
+}
+
+void Controller::sleep_wind()
+{
+    invoke_cmd(Command::SleepWind);
+}
+
+void Controller::reverse_direction()
+{
+    invoke_cmd(Command::ReverseDirection);
 }
 
 }
