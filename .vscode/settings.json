@@ -8,5 +8,10 @@
         "Subsetter",
         "unicodes",
         "webfonts"
+    ],
+    "C_Cpp.default.includePath": [
+        "${userHome}/.platformio/packages/tool-unity/**",
+        "${workspaceFolder}/.pio/build/**",
+        "${workspaceFolder}/lib/**"
     ]
 }
