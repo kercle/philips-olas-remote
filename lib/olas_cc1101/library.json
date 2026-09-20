@@ -1,0 +1,7 @@
+{
+    "name": "olas_cc1101",
+    "version": "1.0.0",
+    "dependencies": {
+        "jgromes/RadioLib": "^7.7.1"
+    }
+}
