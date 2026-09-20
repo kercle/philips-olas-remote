@@ -27,7 +27,7 @@ void FanControllerWebServer::initialize()
         server.send_P(200, "text/html", assets::INDEX_HTML);
     });
 
-    server.on("/index.js", HTTP_GET, []() {
+    server.on("/js/index.js", HTTP_GET, []() {
         server.send_P(200, "text/javascript", assets::INDEX_JS);
     });
 
