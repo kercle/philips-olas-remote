@@ -101,11 +101,13 @@ FanState Controller::get_state() const
 void Controller::light_on()
 {
     invoke_cmd(Command::LightOn);
+    state.light = true;
 }
 
 void Controller::light_off()
 {
     invoke_cmd(Command::LightOff);
+    state.light = false;
 }
 
 void Controller::fan_on(uint8_t speed)
@@ -135,11 +137,14 @@ void Controller::fan_on(uint8_t speed)
         // maximal speed.
         invoke_cmd(Command::FanSpeed6);
     }
+
+    state.fan = speed;
 }
 
 void Controller::fan_off()
 {
     invoke_cmd(Command::FanOff);
+    state.fan = 0;
 }
 
 void Controller::increase_brightness(uint8_t steps)
@@ -164,6 +169,7 @@ void Controller::sleep_wind()
 void Controller::reverse_direction()
 {
     invoke_cmd(Command::ReverseDirection);
+    state.reversed = !state.reversed;
 }
 
 }
