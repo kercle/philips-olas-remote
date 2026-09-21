@@ -4,4 +4,4 @@
 .vscode/launch.json
 .vscode/ipch
 include/secrets.h
-include/web_assets/assets
+include/web_remote/assets
