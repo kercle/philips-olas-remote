@@ -113,16 +113,22 @@ void Controller::fan_on(uint8_t speed)
     switch (speed) {
     case 0:
         invoke_cmd(Command::FanOff);
+        break;
     case 1:
         invoke_cmd(Command::FanSpeed1);
+        break;
     case 2:
         invoke_cmd(Command::FanSpeed2);
+        break;
     case 3:
         invoke_cmd(Command::FanSpeed3);
+        break;
     case 4:
         invoke_cmd(Command::FanSpeed4);
+        break;
     case 5:
         invoke_cmd(Command::FanSpeed5);
+        break;
     default:
         // Maximum speed is 6, so anything above
         // this values is interpreted as this
