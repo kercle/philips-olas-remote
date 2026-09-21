@@ -4,7 +4,7 @@
 #include <web_remote/assets/css/regular.min.css.h>
 #include <web_remote/assets/css/solid.min.css.h>
 #include <web_remote/assets/index.html.h>
-#include <web_remote/assets/index.js.h>
+#include <web_remote/assets/js/index.js.h>
 #include <web_remote/assets/favicon.svg.h>
 #include <web_remote/assets/webfonts/fa-regular-custom.woff2.h>
 #include <web_remote/assets/webfonts/fa-solid-custom.woff2.h>
@@ -28,7 +28,7 @@ void FanControllerWebServer::initialize()
     });
 
     server.on("/js/index.js", HTTP_GET, []() {
-        server.send_P(200, "text/javascript", assets::INDEX_JS);
+        server.send_P(200, "text/javascript", assets::JS_INDEX_JS);
     });
 
     server.on("/css/index.css", HTTP_GET, []() {
