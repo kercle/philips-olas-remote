@@ -81,6 +81,7 @@ void Controller::handle_received_data()
             // Not our device.
             // In the future, we can record these
             // IDs for runtime pairing.
+            frame = transmitter.receive_frame();
             continue;
         }
 
