@@ -37,6 +37,10 @@ def guess_mime_from_ending(path: Path) -> str:
             return "image/svg+xml"
         case ".woff2":
             return "font/woff2"
+        case ".json":
+            return "application/json"
+        case ".png":
+            return "image/png"
         case _:
             raise NotImplementedError()
 
@@ -99,7 +103,7 @@ def process_web_assets(assets_dir):
 
 
 def embed_file(source: Path, target: Path, asset_name: str) -> bool:
-    if source.suffix.lower() in [".html", ".css", ".js", ".svg"]:
+    if source.suffix.lower() in [".html", ".css", ".js", ".svg", ".json"]:
         embed_text_file(source, target, asset_name)
         return False
     else:
