@@ -90,16 +90,18 @@ def process_web_assets(assets_dir):
 
             if str(path) == "index.html":
                 # We assume `index.html` is being served as root document
-                f.write(f' \\\n    (server).on("/", HTTP_GET, []() {{ \\\n')
-            else:
-                f.write(
-                    f' \\\n    (server).on("/{path}", HTTP_GET, []() {{ \\\n',
-                )
+                register_endpoint(f, "", mime, name, len_specifier)
 
-            f.write("        (server).send_P(200, ")
-            f.write(f'"{mime}", assets::{name}{len_specifier}); \\\n')
-            f.write("    });")
+            register_endpoint(f, path, mime, name, len_specifier)
+
         f.write("\n")
+
+
+def register_endpoint(f, path, mime, asset_name, len_specifier):
+    f.write(f' \\\n    (server).on("/{path}", HTTP_GET, []() {{ \\\n')
+    f.write("        (server).send_P(200, ")
+    f.write(f'"{mime}", assets::{asset_name}{len_specifier}); \\\n')
+    f.write("    });")
 
 
 def embed_file(source: Path, target: Path, asset_name: str) -> bool:
