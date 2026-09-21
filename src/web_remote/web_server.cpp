@@ -1,13 +1,15 @@
 #include <config.h>
 
-#include <web_remote/assets/css/index.css.h>
-#include <web_remote/assets/css/regular.min.css.h>
-#include <web_remote/assets/css/solid.min.css.h>
-#include <web_remote/assets/index.html.h>
-#include <web_remote/assets/js/index.js.h>
-#include <web_remote/assets/favicon.svg.h>
-#include <web_remote/assets/webfonts/fa-regular-custom.woff2.h>
-#include <web_remote/assets/webfonts/fa-solid-custom.woff2.h>
+#include <web_remote/assets/web/css/index.css.h>
+#include <web_remote/assets/web/css/regular.min.css.h>
+#include <web_remote/assets/web/css/solid.min.css.h>
+#include <web_remote/assets/web/index.html.h>
+#include <web_remote/assets/web/js/index.js.h>
+#include <web_remote/assets/web/favicon.svg.h>
+#include <web_remote/assets/web/webfonts/fa-regular-custom.woff2.h>
+#include <web_remote/assets/web/webfonts/fa-solid-custom.woff2.h>
+
+#include <web_remote/assets/resources.h>
 
 #include <web_remote/web_server.h>
 
@@ -22,6 +24,8 @@ FanControllerWebServer& FanControllerWebServer::get_instance()
 void FanControllerWebServer::initialize()
 {
     // Static assets
+
+    WEB_SERVER_REGISTER_STATIC_ASSETS(server);
 
     server.on("/", HTTP_GET, []() {
         server.send_P(200, "text/html", assets::INDEX_HTML);
