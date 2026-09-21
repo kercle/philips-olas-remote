@@ -7,7 +7,6 @@
 #include <olas/controller.h>
 #include <olas_cc1101/radio.h>
 
-#include <web_remote/assets/web/index.html.h>
 #include <web_remote/web_server.h>
 
 olas_cc1101::RadioTransmitterCC1101 radio(config::pin_cs, config::pin_gdo0, config::pin_gdo2);

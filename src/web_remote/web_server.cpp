@@ -1,14 +1,5 @@
 #include <config.h>
 
-#include <web_remote/assets/web/css/index.css.h>
-#include <web_remote/assets/web/css/regular.min.css.h>
-#include <web_remote/assets/web/css/solid.min.css.h>
-#include <web_remote/assets/web/index.html.h>
-#include <web_remote/assets/web/js/index.js.h>
-#include <web_remote/assets/web/favicon.svg.h>
-#include <web_remote/assets/web/webfonts/fa-regular-custom.woff2.h>
-#include <web_remote/assets/web/webfonts/fa-solid-custom.woff2.h>
-
 #include <web_remote/assets/resources.h>
 
 #include <web_remote/web_server.h>
@@ -26,42 +17,6 @@ void FanControllerWebServer::initialize()
     // Static assets
 
     WEB_SERVER_REGISTER_STATIC_ASSETS(server);
-
-    server.on("/", HTTP_GET, []() {
-        server.send_P(200, "text/html", assets::INDEX_HTML);
-    });
-
-    server.on("/js/index.js", HTTP_GET, []() {
-        server.send_P(200, "text/javascript", assets::JS_INDEX_JS);
-    });
-
-    server.on("/css/index.css", HTTP_GET, []() {
-        server.send_P(200, "text/css", assets::CSS_INDEX_CSS);
-    });
-
-    server.on("/favicon.svg", HTTP_GET, []() {
-        server.send_P(200, "image/svg+xml", assets::FAVICON_SVG);
-    });
-
-    server.on("/css/regular.min.css", HTTP_GET, []() {
-        server.send_P(200, "text/css", assets::CSS_REGULAR_MIN_CSS);
-    });
-
-    server.on("/css/solid.min.css", HTTP_GET, []() {
-        server.send_P(200, "text/css", assets::CSS_SOLID_MIN_CSS);
-    });
-
-    server.on("/webfonts/fa-regular-custom.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2",
-            assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2,
-            sizeof(assets::WEBFONTS_FA_REGULAR_CUSTOM_WOFF2));
-    });
-
-    server.on("/webfonts/fa-solid-custom.woff2", HTTP_GET, []() {
-        server.send_P(200, "font/woff2",
-            assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2,
-            sizeof(assets::WEBFONTS_FA_SOLID_CUSTOM_WOFF2));
-    });
 
     // API endpoints
 

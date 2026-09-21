@@ -10,23 +10,49 @@ project_dir = Path(
     env.subst("$PROJECT_DIR")  # pyright: ignore[reportUndefinedVariable]
 )
 
-assets_dir = project_dir / "web"
-assets_target_dir = project_dir / "include" / "web_remote" / "assets" / "web"
+include_dir = project_dir / "include"
+assets_target_dir = include_dir / "web_remote" / "assets" / "web"
 assets_target_dir.mkdir(parents=True, exist_ok=True)
 
 
 def ignore_file(path: Path):
-    return path.name in ["LICENSE.txt", "Readme.md", ".gitignore"]
+    return path.name in [
+        "LICENSE.txt",
+        "Readme.md",
+        ".gitignore",
+        "fa-regular-400.woff2",  # only subset is included
+        "fa-solid-900.woff2",  # only subset is included
+    ]
 
 
-def process_assets():
+def guess_mime_from_ending(path: Path) -> str:
+    match path.suffix:
+        case ".html":
+            return "text/html"
+        case ".css":
+            return "text/css"
+        case ".js":
+            return "text/javascript"
+        case ".svg":
+            return "image/svg+xml"
+        case ".woff2":
+            return "font/woff2"
+        case _:
+            raise NotImplementedError()
+
+
+def process_web_assets(assets_dir):
+    resources = []
+
     for path in assets_dir.rglob("*"):
         if ignore_file(path) or not path.is_file():
             continue
 
-        target_file = assets_target_dir / path.relative_to(assets_dir)
+        path_in_assets = path.relative_to(assets_dir)
+
+        target_file = assets_target_dir / path_in_assets
         asset_name = (
-            str(path.relative_to(assets_dir))
+            str(path_in_assets)
             .replace("/", "_")
             .replace(".", "_")
             .replace("-", "_")
@@ -34,14 +60,51 @@ def process_assets():
         )
 
         target_file.parent.mkdir(parents=True, exist_ok=True)
-        embed_file(path, target_file.with_name(path.name + ".h"), asset_name)
+        target_header_file = target_file.with_name(path.name + ".h")
+        is_binary = embed_file(path, target_header_file, asset_name)
+
+        resources.append((target_header_file, asset_name, path_in_assets, is_binary))
+
+    with (include_dir / "web_remote/assets/resources.h").open("w") as f:
+        lines = [
+            "// DO NOT MODIFY THIS FILE\n"
+            "// This file is modified by `scripts/embed_web.py`\n\n"
+            "#pragma once\n\n"
+        ]
+        f.writelines(lines)
+
+        for i, _, _, _ in resources:
+            i = Path(i).relative_to(include_dir)
+            f.write(f"#include <{i}>\n")
+
+        f.write("\n#define WEB_SERVER_REGISTER_STATIC_ASSETS(server)")
+
+        for _, name, path, is_binary in resources:
+            mime = guess_mime_from_ending(path)
+
+            len_specifier = f", sizeof(assets::{name})" if is_binary else ""
+
+            if str(path) == "index.html":
+                # We assume `index.html` is being served as root document
+                f.write(f' \\\n    (server).on("/", HTTP_GET, []() {{ \\\n')
+            else:
+                f.write(
+                    f' \\\n    (server).on("/{path}", HTTP_GET, []() {{ \\\n',
+                )
+
+            f.write("        (server).send_P(200, ")
+            f.write(f'"{mime}", assets::{name}{len_specifier}); \\\n')
+            f.write("    });")
+        f.write("\n")
 
 
-def embed_file(source: Path, target: Path, asset_name: str):
-    if source.suffix.lower() in [".html", ".css", ".js"]:
+def embed_file(source: Path, target: Path, asset_name: str) -> bool:
+    if source.suffix.lower() in [".html", ".css", ".js", ".svg"]:
         embed_text_file(source, target, asset_name)
+        return False
     else:
         embed_binary_file(source, target, asset_name)
+        return True
 
 
 def write_header(file_stream: io.TextIOWrapper, asset_name: str):
@@ -82,4 +145,4 @@ def embed_binary_file(source: Path, target: Path, asset_name: str):
         write_footer(f_out)
 
 
-process_assets()
+process_web_assets(project_dir / "web")
